@@ -38,4 +38,22 @@ public class User {
         this.password = password;
         this.username = username;
     }
+
+    public void changeEmail(String email) {
+        if (!this.email.equals(email)) {
+            this.email = email;
+        }
+    }
+
+    public void changePassword(String password) {
+        if (!this.password.equals(password)) {
+            this.password = password;
+        }
+    }
+    public void changeUsername(String username) {
+        if (!this.username.equals(username)) {
+            this.username = username;
+        }
+    }
+
 }

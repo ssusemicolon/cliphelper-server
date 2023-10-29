@@ -18,7 +18,10 @@ public enum ResultCode {
     // 회원 관련
     USER_JOIN_SUCCESS("SU001", "회원가입이 성공적으로 완료되었습니다."),
     USER_LOGIN_SUCCESS("SU002", "로그인이 성공적으로 완료되었습니다."),
-    ALL_USERS_FIND_SUCCESS("SU003", "모든 사용자들을 성공적으로 조회하였습니다."),
+    USER_FIND_SUCCESS("SU003", "회원을 성공적으로 조회하였습니다."),
+    ALL_USERS_FIND_SUCCESS("SU004", "모든 회원들을 성공적으로 조회하였습니다."),
+    USER_MODIFY_SUCCESS("SU005", "회원의 정보를 성공적으로 수정하였습니다."),
+    USER_DELETE_SUCCESS("SU006", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
 
     // 아티클(스크랩 컨텐츠 관련)
     ARTICLE_CREATE_SUCCESS("SA001", "입력한 아티클을 성공적으로 등록하였습니다." ),
