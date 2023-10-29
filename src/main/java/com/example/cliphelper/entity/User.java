@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -20,6 +21,9 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
+    @Email
+    private String email;
+
     @NotBlank
     // @Size(min = 8, max = 30)
     private String password;
@@ -28,8 +32,9 @@ public class User {
     // @Size(min = 2, max = 20)
     private String username;
 
-    public User(String password, String username) {
+    public User(String email, String password, String username) {
         this.id = null;
+        this.email = email;
         this.password = password;
         this.username = username;
     }
