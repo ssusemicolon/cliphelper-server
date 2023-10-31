@@ -1,6 +1,9 @@
 package com.example.cliphelper.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +12,8 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
+@Getter
+@NoArgsConstructor
 @Entity
 public class Tag {
     @Id
@@ -17,9 +22,9 @@ public class Tag {
     private Long id;
 
     @NotBlank
-    private String title;
+    private String name;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    public Tag(String name) {
+        this.name = name;
+    }
 }
