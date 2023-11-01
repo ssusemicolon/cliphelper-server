@@ -1,5 +1,8 @@
 package com.example.cliphelper.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+@Getter
+@NoArgsConstructor
 @Entity
 public class ArticleTag {
     @Id
@@ -22,4 +27,9 @@ public class ArticleTag {
     @ManyToOne
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    public ArticleTag(Article article, Tag tag) {
+        this.article = article;
+        this.tag = tag;
+    }
 }
