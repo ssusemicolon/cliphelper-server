@@ -26,4 +26,9 @@ public class ArticleCollection {
     @ManyToOne
     @JoinColumn(name = "collection_id")
     private Collection collection;
+
+    public ArticleCollection(Article article, Collection collection) {
+        this.article = article;
+        this.collection = collection;
+    }
 }
