@@ -1,5 +1,6 @@
 package com.example.cliphelper.controller;
 
+import com.example.cliphelper.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.dto.CollectionRequestDto;
 import com.example.cliphelper.dto.CollectionResponseDto;
 import com.example.cliphelper.result.ResultCode;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -30,27 +32,11 @@ public class CollectionController {
     }
 
     // 모든 컬렉션 조회
-    @GetMapping("/collections")
+    @GetMapping("/admin/collections")
     public ResultResponse readAllCollections() {
         List<CollectionResponseDto> collectionResponseDtos = collectionService.readAllCollections();
         return ResultResponse.of(ResultCode.ALL_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
     }
-//
-    // 내(가 생성한) 컬렉션 조회
-    // 로그인 방식 변경 후, PathVariable 대신 JWT 통한 확인으로 변경함으로써 URI 변경해야 함
-    @GetMapping("/collections/my/{userId}")
-    public ResultResponse readMyCollections(@PathVariable("userId") Long userId) {
-        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyCollections(userId);
-        return ResultResponse.of(ResultCode.MY_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
-    }
-
-    // 북마크한 컬렉션 조회
-     @GetMapping("/collections/bookmark/{userId}")
-     public ResultResponse readMyBookmarkCollections(@PathVariable("userId") Long userId) {
-        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyBookmarkCollections(userId);
-         return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
-     }
-
 
     //  특정 id를 가진 컬렉션 조회
     @GetMapping("/collections/{collectionId}")
@@ -59,17 +45,33 @@ public class CollectionController {
         return ResultResponse.of(ResultCode.COLLECTION_FIND_SUCCESS, collectionResponseDto);
     }
 
-    // 특정 collectionId를 가진 컬렉션 수정
-    // 컬렉션 info를 수정하는 로직
-    // 컬렉션 내의 아티클을 추가/삭제하는 로직
-    // 위 2개의 로직으로 나눠서 아예 URI를 분리할지, 로직만 분리하여 URI는 통합할지 고민..
-    /*
-    @PatchMapping("/collections/{collectionId}")
-    public ResultResponse modifyCollection(@PathVariable("collectionId") Long collectionId, @Valid @RequestBody CollectionRequestDto collectionRequestDto) {
-        collectionService.modifyCollection(collectionId, collectionRequestDto);
-        return ResultResponse.of(ResultCode.COLLECTION_CREATE_SUCCESS);
+    // 내(가 생성한) 컬렉션 조회
+    @GetMapping("/collections")
+    public ResultResponse readMyCollections(@RequestParam("userId") Long userId) {
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyCollections(userId);
+        return ResultResponse.of(ResultCode.MY_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
     }
-    */
+
+    // 내가 북마크한 컬렉션 조회
+    @GetMapping("/bookmarks")
+    public ResultResponse readMyBookmarkCollections(@RequestParam("userId") Long userId) {
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyBookmarkCollections(userId);
+        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
+    }
+
+    // 특정 컬렉션의 정보를 수정
+    @PatchMapping("/collections/{collectionId}")
+    public ResultResponse modifyCollectionInfo(@PathVariable("collectionId") Long collectionId, @RequestBody CollectionModifyRequestDto collectionModifyRequestDto) {
+        collectionService.modifyCollectionInfo(collectionId, collectionModifyRequestDto);
+        return ResultResponse.of(ResultCode.COLLECTION_MODIFY_SUCCESS);
+    }
+
+    // 컬렉션 내의 아티클 목록에서 특정 아티클 삭제
+    @PatchMapping("/collections/{collectionId}/article/{articleId}")
+    public ResultResponse deleteArticleInCollection(@PathVariable("collectionId") Long collectionId, @PathVariable("articleId") Long articleId) {
+        collectionService.deleteArticleInCollection(collectionId, articleId);
+        return ResultResponse.of(ResultCode.COLLECTION_MODIFY_SUCCESS);
+    }
 
     // 특정 collectionId를 가진 컬렉션 삭제
     @DeleteMapping("/collections/{collectionId}")

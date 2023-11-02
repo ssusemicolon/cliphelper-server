@@ -18,13 +18,13 @@ import javax.validation.Valid;
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
-    @PostMapping("/collections/bookmark")
+    @PostMapping("/bookmarks")
     public ResultResponse addBookmark(@Valid @RequestBody BookmarkRequestDto bookmarkRequestDto) {
         bookmarkService.addBookmark(bookmarkRequestDto);
         return ResultResponse.of(ResultCode.BOOKMARK_COLLECTION_SUCCESS);
     }
 
-    @DeleteMapping("/collections/bookmark/{bookmarkId}")
+    @DeleteMapping("/bookmarks/{bookmarkId}")
     public ResultResponse deleteBookmark(@PathVariable("bookmarkId") Long bookmarkId) {
         bookmarkService.deleteBookmark(bookmarkId);
         return ResultResponse.of(ResultCode.BOOKMARK_DELETE_SUCCESS);

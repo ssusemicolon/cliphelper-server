@@ -1,5 +1,6 @@
 package com.example.cliphelper.controller;
 
+import com.example.cliphelper.dto.ArticleModifyRequestDto;
 import com.example.cliphelper.dto.ArticleRequestDto;
 import com.example.cliphelper.dto.ArticleResponseDto;
 import com.example.cliphelper.result.ResultCode;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -27,7 +29,9 @@ public class ArticleController {
         articleService.createArticle(articleRequestDto);
         return ResultResponse.of(ResultCode.ARTICLE_CREATE_SUCCESS);
     }
-    @GetMapping("/articles")
+
+    // 관리자 전용 API
+    @GetMapping("/admin/articles")
     public ResultResponse findAllArticles() {
         List<ArticleResponseDto> articleResponseDtos = articleService.findAllArticles();
         return ResultResponse.of(ResultCode.ALL_ARTICLES_FIND_SUCCESS, articleResponseDtos);
@@ -39,14 +43,22 @@ public class ArticleController {
         return ResultResponse.of(ResultCode.ARTICLE_FIND_SUCCESS, articleResponseDto);
     }
 
-//    @GetMapping("/users/{userId}/articles")
-//    public ResultResponse findArticlesOfSpecificUser(@PathVariable("userId") Long userId) {
-//
-//    }
-//
+    @GetMapping("/articles")
+    public ResultResponse findMyArticles(@RequestParam("userId") Long userId) {
+        List<ArticleResponseDto> articleResponseDtos = articleService.findMyArticles(userId);
+        return ResultResponse.of(ResultCode.ALL_ARTICLES_FIND_SUCCESS, articleResponseDtos);
+    }
+
     @PatchMapping("/articles/{articleId}")
-    public ResultResponse modifyArticle(@PathVariable("articleId") Long articleId, @Valid @RequestBody ArticleRequestDto articleRequestDto) {
-        articleService.modifyArticle(articleId, articleRequestDto);
+    public ResultResponse modifyArticle(@PathVariable("articleId") Long articleId, @RequestBody ArticleModifyRequestDto articleModifyRequestDto) {
+        articleService.modifyArticle(articleId, articleModifyRequestDto);
+        return ResultResponse.of(ResultCode.ARTICLE_MODIFY_SUCCESS);
+    }
+
+    // 특정 아티클이 속해 있는 컬렉션 편집
+    @PatchMapping("/articles/{articleId}/collections")
+    public ResultResponse modifyArticleListOfCollection(@PathVariable("articleId") Long articleId, @RequestBody List<Long> collectionIdList) {
+        articleService.modifyArticleListOfCollection(articleId, collectionIdList);
         return ResultResponse.of(ResultCode.ARTICLE_MODIFY_SUCCESS);
     }
 

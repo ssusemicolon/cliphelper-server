@@ -1,9 +1,11 @@
 package com.example.cliphelper.service;
 
+import com.example.cliphelper.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.dto.CollectionRequestDto;
 import com.example.cliphelper.dto.CollectionResponseDto;
 import com.example.cliphelper.entity.Article;
 import com.example.cliphelper.entity.ArticleCollection;
+import com.example.cliphelper.entity.ArticleTag;
 import com.example.cliphelper.entity.Bookmark;
 import com.example.cliphelper.entity.Collection;
 import com.example.cliphelper.entity.User;
@@ -77,14 +79,6 @@ public class CollectionService {
         return CollectionResponseDto.of(collection, articleIdList);
     }
 
-    public void deleteCollection(Long collectionId) {
-        if (collectionRepository.existsById(collectionId)) {
-            collectionRepository.deleteById(collectionId);
-        } else {
-            throw new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다.");
-        }
-    }
-
     public List<CollectionResponseDto> readMyCollections(Long userId) {
         List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
         List<Collection> collections = collectionRepository.findByUserId(userId);
@@ -109,16 +103,59 @@ public class CollectionService {
 
         List<Bookmark> bookmarks = user.getBookmarks();
         bookmarks.forEach(bookmark -> {
-           Collection collection = bookmark.getCollection();
-           List<Long> articleIdList = new ArrayList<>();
+            Collection collection = bookmark.getCollection();
+            List<Long> articleIdList = new ArrayList<>();
 
-           collection.getArticleCollections().forEach(articleCollection -> {
-               Article article = articleCollection.getArticle();
-               articleIdList.add(article.getId());
-           });
-           collectionResponseDtos.add(CollectionResponseDto.of(collection, articleIdList));
+            collection.getArticleCollections().forEach(articleCollection -> {
+                Article article = articleCollection.getArticle();
+                articleIdList.add(article.getId());
+            });
+            collectionResponseDtos.add(CollectionResponseDto.of(collection, articleIdList));
         });
 
         return collectionResponseDtos;
     }
+
+    public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다."));
+
+        collection.changeInfo(
+                collectionModifyRequestDto.getTitle(),
+                collectionModifyRequestDto.getDescription(),
+                collectionModifyRequestDto.getIsPublic());
+
+        collectionRepository.save(collection);
+    }
+
+    public void deleteArticleInCollection(Long collectionId, Long articleId) {
+        if (!collectionRepository.existsById(collectionId)) {
+            throw new RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다.");
+        }
+
+        ArticleCollection articleCollection = articleCollectionRepository.findByArticleIdAndCollectionId(articleId, collectionId)
+                .orElseThrow(() -> new RuntimeException("해당 컬렉션에 해당 articleId를 가진 아티클이 존재하지 않습니다."));
+
+        articleCollectionRepository.deleteById(articleCollection.getId());
+    }
+
+    public void deleteCollection(Long collectionId) {
+        if (collectionRepository.existsById(collectionId)) {
+            collectionRepository.deleteById(collectionId);
+        } else {
+            throw new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다.");
+        }
+    }
+
+    /*
+    public void addArticleInCollection(Long collectionId, Long articleId) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다."));
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
+
+        articleCollectionRepository.save(new ArticleCollection(article, collection));
+    }
+    */
 }

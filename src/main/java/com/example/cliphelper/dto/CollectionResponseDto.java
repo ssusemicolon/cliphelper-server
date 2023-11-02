@@ -15,9 +15,9 @@ public class CollectionResponseDto {
     private final String title;
     private final String description;
     private final boolean isPublic;
-    private final Long userId;
     private final List<Long> articles;
     private final int articleCount;
+    private final Long userId;
 
     public static CollectionResponseDto of(Collection collection, List<Long> articles) {
         return CollectionResponseDto.builder()
@@ -25,9 +25,9 @@ public class CollectionResponseDto {
                 .title(collection.getTitle())
                 .description(collection.getDescription())
                 .isPublic(collection.isPublic())
-                .userId(collection.getUser().getId())
                 .articles(articles)
                 .articleCount(collection.getArticleCount())
+                .userId(collection.getUser().getId())
                 .build();
     }
 }

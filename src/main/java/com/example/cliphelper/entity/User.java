@@ -45,21 +45,26 @@ public class User {
         this.username = username;
     }
 
-    public void changeEmail(String email) {
-        if (!this.email.equals(email)) {
+    public void changeInfo(String email, String password, String username) {
+        changeEmail(email);
+        changePassword(password);
+        changeUsername(username);
+    }
+
+    private void changeEmail(String email) {
+        if (this.email != null) {
             this.email = email;
         }
     }
-
-    public void changePassword(String password) {
-        if (!this.password.equals(password)) {
+    private void changePassword(String password) {
+        if (this.password != null) {
             this.password = password;
         }
     }
-    public void changeUsername(String username) {
-        if (!this.username.equals(username)) {
+
+    private void changeUsername(String username) {
+        if (this.username != null) {
             this.username = username;
         }
     }
-
 }

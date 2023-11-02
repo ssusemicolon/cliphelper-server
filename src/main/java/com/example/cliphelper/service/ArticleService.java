@@ -1,13 +1,18 @@
 package com.example.cliphelper.service;
 
+import com.example.cliphelper.dto.ArticleModifyRequestDto;
 import com.example.cliphelper.dto.ArticleRequestDto;
 import com.example.cliphelper.dto.ArticleResponseDto;
 import com.example.cliphelper.entity.Article;
+import com.example.cliphelper.entity.ArticleCollection;
 import com.example.cliphelper.entity.ArticleTag;
+import com.example.cliphelper.entity.Collection;
 import com.example.cliphelper.entity.Tag;
 import com.example.cliphelper.entity.User;
+import com.example.cliphelper.repository.ArticleCollectionRepository;
 import com.example.cliphelper.repository.ArticleRepository;
 import com.example.cliphelper.repository.ArticleTagRepository;
+import com.example.cliphelper.repository.CollectionRepository;
 import com.example.cliphelper.repository.TagRepository;
 import com.example.cliphelper.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +27,8 @@ import java.util.stream.Collectors;
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleTagRepository articleTagRepository;
+    private final ArticleCollectionRepository articleCollectionRepository;
+    private final CollectionRepository collectionRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final TagService tagService;
@@ -59,6 +66,25 @@ public class ArticleService {
         return articleResponseDtos;
     }
 
+    public List<ArticleResponseDto> findMyArticles(Long userId) {
+        List<Article> articles = articleRepository.findByUserId(userId);
+        List<ArticleResponseDto> articleResponseDtos = new ArrayList<>();
+
+        articles.forEach(article -> {
+            List<ArticleTag> articleTags = article.getArticleTags();
+            List<String> tags = new ArrayList<>();
+
+            articleTags.forEach(articleTag -> {
+                Tag tag = articleTag.getTag();
+                tags.add(tag.getName());
+            });
+
+            articleResponseDtos.add(ArticleResponseDto.of(article, tags));
+        });
+
+        return articleResponseDtos;
+    }
+
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다."));
@@ -74,6 +100,60 @@ public class ArticleService {
         return ArticleResponseDto.of(article, tags);
     }
 
+    public void modifyArticle(Long articleId, ArticleModifyRequestDto articleModifyRequestDto) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다."));
+
+        changeArticleInfo(article,
+                articleModifyRequestDto.getUrl(),
+                articleModifyRequestDto.getTitle(),
+                articleModifyRequestDto.getDescription(),
+                articleModifyRequestDto.getMemo());
+
+        changeTags(article, articleModifyRequestDto.getTags());
+
+        articleRepository.save(article);
+    }
+
+    public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
+
+        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
+
+        List<ArticleCollection> modifiedArticleCollectionList = new ArrayList<>();
+        collectionIdList.forEach(collectionId -> {
+            Collection collection = collectionRepository.findById(collectionId)
+                    .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 아티클이 존재하지 않습니다."));
+
+            ArticleCollection articleCollection = articleCollectionRepository.findByArticleIdAndCollectionId(articleId, collectionId)
+                    .orElse(new ArticleCollection(article, collection));
+            modifiedArticleCollectionList.add(articleCollection);
+        });
+
+        changeCollection(originalArticleCollectionList, modifiedArticleCollectionList);
+    }
+
+    private void changeCollection(List<ArticleCollection> originalArticleCollectionList, List<ArticleCollection> modifiedArticleCollectionList) {
+        List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList.stream()
+                .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
+                .collect(Collectors.toList());
+
+        newArticleCollectionList.forEach(articleCollection -> {
+            articleCollectionRepository.save(articleCollection);
+            articleCollection.getCollection().addArticleCount();
+        });
+
+        List<ArticleCollection> deletedArticleCollectionList = originalArticleCollectionList.stream()
+                .filter(articleCollection -> !modifiedArticleCollectionList.contains(articleCollection))
+                .collect(Collectors.toList());
+
+        deletedArticleCollectionList.forEach(articleCollection -> {
+            articleCollectionRepository.deleteById(articleCollection.getId());
+            articleCollection.getCollection().minusArticleCount();
+        });
+    }
+
     public void deleteArticle(Long articleId) {
         if (articleRepository.existsById(articleId)) {
             articleRepository.deleteById(articleId);
@@ -82,38 +162,11 @@ public class ArticleService {
         }
     }
 
-    public void modifyArticle(Long articleId, ArticleRequestDto articleRequestDto) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다."));
-
-        changeArticleInfo(article, articleRequestDto);
-        articleRepository.save(article);
-    }
-
-    private void changeArticleInfo(Article article, ArticleRequestDto articleRequestDto) {
-        // null 체크 후, null이 아닌 경우만 변경
-        // =================================================================
-        // 근데, null이 가능한 데이터는?
-        // 예시로 기존에 작성한 데이터(메모)를 지우고 싶어서 null로 보낼 땐 어떡하지? 해결 필요
-        // =================================================================
-
-        if (articleRequestDto.getUrl() != null) {
-            article.changeUrl(articleRequestDto.getUrl());
-        }
-
-        if (articleRequestDto.getTitle() != null) {
-            article.changeTitle(articleRequestDto.getTitle());
-        }
-
-        if (articleRequestDto.getDescription() != null) {
-            article.changeDescription(articleRequestDto.getDescription());
-        }
-
-        if (articleRequestDto.getMemo() != null) {
-            article.changeMemo(articleRequestDto.getMemo());
-        }
-
-        changeTags(article, articleRequestDto.getTags());
+    private void changeArticleInfo(Article article, String url, String title, String description, String memo) {
+        article.changeUrl(url);
+        article.changeTitle(title);
+        article.changeDescription(description);
+        article.changeMemo(memo);
     }
 
     private void changeTags(Article article, List<String> modifiedTagNames) {
@@ -136,7 +189,6 @@ public class ArticleService {
 
         changeTags(article, originalTags, modifiedTags);
     }
-
     private void changeTags(Article article, List<Tag> originalTags, List<Tag> modifiedTags) {
         // 요청 태그 중, 기존 태그에 없는 태그인 새로운 태그 관련 ArticleTag 객체 추가
         List<Tag> newTags = modifiedTags.stream()
@@ -158,9 +210,5 @@ public class ArticleService {
             article.getArticleTags().remove(articleTag);
             articleTagRepository.delete(articleTag);
         });
-
-        // [A, B, C] 기존 태그
-        // [A, C, D] 수정 요청 태그
     }
-
 }
