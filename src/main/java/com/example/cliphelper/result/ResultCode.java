@@ -33,15 +33,17 @@ public enum ResultCode {
     // 컬렉션 관련
     COLLECTION_CREATE_SUCCESS("SC001", "입력한 컬렉션을 성공적으로 생성하였습니다." ),
     COLLECTION_FIND_SUCCESS("SC002", "입력한 articleId의 아티클을 성공적으로 조회하였습니다."),
-    ALL_COLLECTIONS_FIND_SUCCESS("SC003", "컬렉션 목록을 성공적으로 조회하였습니다."),
-    COLLECTION_MODIFY_SUCCESS("SC004", "입력한 collectionId의 컬렉션을 성공적으로 수정하였습니다."),
-    COLLECTION_DELETE_SUCCESS("SC005", "입력한 collectionId의 컬렉션을 성공적으로 삭제하였습니다"),
-    ARTICLE_ADD_TO_COLLECTION_SUCCESS("SC006", "해당 아티클을 컬렉션에 성공적으로 추가하였습니다."),
+    ALL_COLLECTIONS_FIND_SUCCESS("SC003", "전체 컬렉션 목록을 성공적으로 조회하였습니다."),
+    MY_COLLECTIONS_FIND_SUCCESS("SC004", "내 컬렉션 목록을 성공적으로 조회하였습니다."),
+    COLLECTION_MODIFY_SUCCESS("SC005", "입력한 collectionId의 컬렉션을 성공적으로 수정하였습니다."),
+    COLLECTION_DELETE_SUCCESS("SC006", "입력한 collectionId의 컬렉션을 성공적으로 삭제하였습니다"),
+    ARTICLE_ADD_TO_COLLECTION_SUCCESS("SC007", "해당 아티클을 컬렉션에 성공적으로 추가하였습니다."),
 
-    // 북마크 관련
+    // 북마크 관련,
     BOOKMARK_COLLECTION_SUCCESS("SB001", "선택한 컬렉션을 성공적으로 북마크하였습니다."),
     BOOKMARK_FIND_SUCCESS("SB002", "입력한 bookmarkId의 북마크 컬렉션을 성공적으로 조회하였습니다."),
     ALL_BOOKMARKS_FIND_SUCCESS("SB003", "모든 북마크 컬렉션 목록을 성공적으로 조회하였습니다."),
+    MY_BOOKMARKS_FIND_SUCCESS("SB000", "사용자의 모든 북마크 컬렉션 목록을 성공적으로 조회하였습니다."),
     BOOKMARK_MODIFY_SUCCESS("SB004", "입력한 collectionId의 북마크 컬렉션을 성공적으로 수정하였습니다."),
     BOOKMARK_DELETE_SUCCESS("SB005", "입력한 collectionId의 북마크 컬렉션을 성공적으로 삭제하였습니다."),
 
@@ -49,6 +51,7 @@ public enum ResultCode {
     ALARM_SEND_SUCCESS("SAL001", "푸시 알림을 성공적으로 전송하였습니다."),
 
     ;
+
 
     private final String code;
     private final String message;
