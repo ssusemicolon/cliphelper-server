@@ -61,4 +61,28 @@ public class Collection {
     public void minusArticleCount() {
         this.articleCount--;
     }
+
+    public void changeInfo(String title, String description, boolean isPublic) {
+        changeTitle(title);
+        changeDescription(description);
+        changeIsPublic(isPublic);
+    }
+
+    private void changeTitle(String title) {
+        if (this.title != title) {
+            this.title = title;
+        }
+    }
+
+    private void changeDescription(String description) {
+        if (this.description != description) {
+            this.description = description;
+        }
+    }
+
+    private void changeIsPublic(boolean isPublic) {
+        if (this.isPublic != isPublic) {
+            this.isPublic = isPublic;
+        }
+    }
 }

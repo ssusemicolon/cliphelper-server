@@ -10,21 +10,8 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class CollectionRequestDto {
-    @NotBlank
+public class CollectionModifyRequestDto {
     private String title;
-
     private String description;
-
-    @NotNull
-    private boolean isPublic;
-
-    @NotNull
-    private Long userId;
-
-    private List<Long> articles;
-
-    public Collection toEntity() {
-        return new Collection(title, description, isPublic);
-    }
+    private Boolean isPublic;
 }

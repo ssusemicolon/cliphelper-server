@@ -1,5 +1,6 @@
 package com.example.cliphelper.service;
 
+import com.example.cliphelper.dto.UserModifyRequestDto;
 import com.example.cliphelper.dto.UserRequestDto;
 import com.example.cliphelper.dto.UserResponseDto;
 import com.example.cliphelper.entity.User;
@@ -53,13 +54,14 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void modifyUser(Long userId, UserRequestDto userRequestDto) {
+    public void modifyUser(Long userId, UserModifyRequestDto userModifyRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
 
-        user.changeEmail(userRequestDto.getEmail());
-        user.changePassword(userRequestDto.getPassword());
-        user.changeUsername(userRequestDto.getUsername());
+        user.changeInfo(
+                userModifyRequestDto.getEmail(),
+                userModifyRequestDto.getPassword(),
+                userModifyRequestDto.getUsername());
 
         userRepository.save(user);
     }

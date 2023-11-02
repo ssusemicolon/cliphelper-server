@@ -30,18 +30,7 @@ public class ArticleResponseDto {
     // 클라이언트에게 전달해줄 값은 name만이므로, List<String> 타입으로 선언함
     private final List<String> tags;
 
-    /*
-    public static ArticleResponseDto of(Article article) {
-        return ArticleResponseDto.builder()
-                .articleId(article.getId())
-                .url(article.getUrl())
-                .title(article.getTitle())
-                .description(article.getDescription())
-                .memo(article.getMemo())
-                .createdAt(article.getCreatedAt())
-                .recentAccessTime(article.getRecentAccessTime())
-                .build();
-    }*/
+    private final Long userId;
 
     public static ArticleResponseDto of(Article article, List<String> tags) {
         return ArticleResponseDto.builder()
@@ -53,6 +42,7 @@ public class ArticleResponseDto {
                 .createdAt(article.getCreatedAt())
                 .recentAccessTime(article.getRecentAccessTime())
                 .tags(tags)
+                .userId(article.getUser().getId())
                 .build();
     }
 }

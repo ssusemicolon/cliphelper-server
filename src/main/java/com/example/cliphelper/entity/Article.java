@@ -52,23 +52,33 @@ public class Article {
     }
 
     public void setUser(User user) {
-        this.user = user;
+        if (user != null) {
+            this.user = user;
+        }
     }
 
     public void changeUrl(String url) {
-        this.url = url;
+        if (url != null) {
+            this.url = url;
+        }
     }
 
     public void changeTitle(String title) {
-        this.title = title;
+        if (title != null) {
+            this.title = title;
+        }
     }
 
     public void changeDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public void changeMemo(String memo) {
-        this.memo = memo;
+        if (memo != null) {
+            this.memo = memo;
+        }
     }
 
 }

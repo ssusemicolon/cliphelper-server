@@ -1,5 +1,6 @@
 package com.example.cliphelper.controller;
 
+import com.example.cliphelper.dto.UserModifyRequestDto;
 import com.example.cliphelper.dto.UserRequestDto;
 import com.example.cliphelper.dto.UserResponseDto;
 import com.example.cliphelper.result.ResultCode;
@@ -25,10 +26,10 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/users")
+    @PostMapping("/auth/signup")
     public ResultResponse join(@Valid @RequestBody UserRequestDto userRequestDto) {
         Long userId = userService.createUser(userRequestDto);
-        return ResultResponse.of(ResultCode.USER_JOIN_SUCCESS, userId);
+        return ResultResponse.of(ResultCode.USER_JOIN_SUCCESS);
     }
 
     @GetMapping("/users")
@@ -44,8 +45,8 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}")
-    public ResultResponse modifyUser(@PathVariable("userId") Long userId, @Valid @RequestBody UserRequestDto userRequestDto) {
-        userService.modifyUser(userId, userRequestDto);
+    public ResultResponse modifyUser(@PathVariable("userId") Long userId, @Valid @RequestBody UserModifyRequestDto userModifyRequestDto) {
+        userService.modifyUser(userId, userModifyRequestDto);
         return ResultResponse.of(ResultCode.USER_MODIFY_SUCCESS);
     }
 
