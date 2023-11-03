@@ -1,6 +1,5 @@
 package com.example.cliphelper.domain.collection.controller;
 
-import com.example.cliphelper.domain.bookmark.dto.BookmarkResponseDto;
 import com.example.cliphelper.domain.collection.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -48,16 +46,9 @@ public class CollectionController {
 
     // 내(가 생성한) 컬렉션 조회
     @GetMapping("/collections")
-    public ResultResponse readMyCollections(@RequestParam("userId") Long userId) {
-        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyCollections(userId);
+    public ResultResponse readMyCollections() {
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyCollections();
         return ResultResponse.of(ResultCode.MY_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
-    }
-
-    // 내가 북마크한 컬렉션 조회
-    @GetMapping("/bookmarks")
-    public ResultResponse readMyBookmarkCollections(@RequestParam("userId") Long userId) {
-        List<BookmarkResponseDto> bookmarkResponseDtos = collectionService.readMyBookmarkCollections(userId);
-        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, bookmarkResponseDtos);
     }
 
     // 특정 컬렉션의 정보를 수정

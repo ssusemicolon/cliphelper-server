@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
-
 @RestController
 public class UserController {
     private final UserService userService;
@@ -31,23 +30,25 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResultResponse findAllUsers() {
-        List<UserResponseDto> userResponseDtos = userService.findAllUsers();
-        return ResultResponse.of(ResultCode.ALL_USERS_FIND_SUCCESS, userResponseDtos);
-    }
-
-    @GetMapping("/users/{userId}")
-    public ResultResponse findUser(@PathVariable("userId") Long userId) {
-        UserResponseDto userResponseDto = userService.findUser(userId);
+    public ResultResponse findUser() {
+        UserResponseDto userResponseDto = userService.findUser();
         return ResultResponse.of(ResultCode.USER_FIND_SUCCESS, userResponseDto);
     }
 
+    /**
+     * @param userId
+     * @param userModifyRequestDto
+     * ===추후 구현 예정===
+     * 회원의 활동 정보를 반환한다.
+     * 스크랩 개수, 북마크 개수, 팔로워, 알림받을 시간 목록 등
+     * @return
+     */
     /*
-    @GetMapping("/users/{userId}/profile")
-    public ResultResponse getUserProfile(@PathVariable("userId") Long userId) {
-        UserProfileResponseDto userProfileResponseDto = userService.getUserProfile(userId);
-        return ResultResponse.of(ResultCode.USER_FIND_SUCCESS, userProfileResponseDto);
-    }
+     * @GetMapping("/users/{userId}/profile")
+     * public ResultResponse getUserProfile(@PathVariable("userId") Long userId) {
+     * UserProfileResponseDto userProfileResponseDto = userService.getUserProfile(userId);
+     * return ResultResponse.of(ResultCode.USER_FIND_SUCCESS, userProfileResponseDto);
+     * }
      */
 
     @PatchMapping("/users/{userId}")

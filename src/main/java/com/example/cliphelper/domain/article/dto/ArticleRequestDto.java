@@ -1,13 +1,11 @@
 package com.example.cliphelper.domain.article.dto;
 
 import com.example.cliphelper.domain.article.entity.Article;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
@@ -18,8 +16,7 @@ public class ArticleRequestDto {
     private String title;
     private String description;
     private String memo;
-    @NotNull
-    private Long userId;
+
     private List<String> tags;
 
     public Article toEntity() {
