@@ -1,5 +1,11 @@
 package com.example.cliphelper.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.example.cliphelper.dto.ArticleModifyRequestDto;
 import com.example.cliphelper.dto.ArticleRequestDto;
 import com.example.cliphelper.dto.ArticleResponseDto;
@@ -15,12 +21,8 @@ import com.example.cliphelper.repository.ArticleTagRepository;
 import com.example.cliphelper.repository.CollectionRepository;
 import com.example.cliphelper.repository.TagRepository;
 import com.example.cliphelper.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -32,13 +34,13 @@ public class ArticleService {
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final TagService tagService;
-
+    private final SecurityUtils securityUtils;
 
     public void createArticle(ArticleRequestDto articleRequestDto) {
         // 여기서 해당 userId를 가진 회원이 존재하는지 여부를 확인하지 않는다.
         // 왜냐면, JWT로 전달받았을 때, 이미 해당 토큰이 유효한지 검증한 이후이기 때문이다.
         Article article = articleRequestDto.toEntity();
-        User user = userRepository.findById(articleRequestDto.getUserId())
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElse(null);
         article.setUser(user);
         articleRepository.save(article);
@@ -126,7 +128,8 @@ public class ArticleService {
             Collection collection = collectionRepository.findById(collectionId)
                     .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 아티클이 존재하지 않습니다."));
 
-            ArticleCollection articleCollection = articleCollectionRepository.findByArticleIdAndCollectionId(articleId, collectionId)
+            ArticleCollection articleCollection = articleCollectionRepository
+                    .findByArticleIdAndCollectionId(articleId, collectionId)
                     .orElse(new ArticleCollection(article, collection));
             modifiedArticleCollectionList.add(articleCollection);
         });
@@ -134,7 +137,8 @@ public class ArticleService {
         changeCollection(originalArticleCollectionList, modifiedArticleCollectionList);
     }
 
-    private void changeCollection(List<ArticleCollection> originalArticleCollectionList, List<ArticleCollection> modifiedArticleCollectionList) {
+    private void changeCollection(List<ArticleCollection> originalArticleCollectionList,
+            List<ArticleCollection> modifiedArticleCollectionList) {
         List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList.stream()
                 .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
                 .collect(Collectors.toList());
@@ -189,6 +193,7 @@ public class ArticleService {
 
         changeTags(article, originalTags, modifiedTags);
     }
+
     private void changeTags(Article article, List<Tag> originalTags, List<Tag> modifiedTags) {
         // 요청 태그 중, 기존 태그에 없는 태그인 새로운 태그 관련 ArticleTag 객체 추가
         List<Tag> newTags = modifiedTags.stream()

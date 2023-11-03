@@ -16,9 +16,10 @@ public class BookmarkService {
     private final UserRepository userRepository;
     private final CollectionRepository collectionRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final SecurityUtils securityUtils;
 
     public void addBookmark(BookmarkRequestDto bookmarkRequestDto) {
-        User user = userRepository.findById(bookmarkRequestDto.getUserId())
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
 
         Collection collection = collectionRepository.findById(bookmarkRequestDto.getCollectionId())

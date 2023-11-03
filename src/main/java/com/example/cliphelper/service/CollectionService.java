@@ -27,12 +27,13 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final ArticleCollectionRepository articleCollectionRepository;
+    private final SecurityUtils securityUtils;
 
     // 컬렉션 등록, 수정 시 모든 article을 추가할 수 있는 상태임.
     // article을 컬렉션에 넣기 전에, 내 아티클인지 확인하는 로직을 넣어야 한다고 생각함.
     public void createCollection(CollectionRequestDto collectionRequestDto) {
         Collection collection = collectionRequestDto.toEntity();
-        User user = userRepository.findById(collectionRequestDto.getUserId())
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
         collection.setUser(user);
         collectionRepository.save(collection);
@@ -134,7 +135,8 @@ public class CollectionService {
             throw new RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다.");
         }
 
-        ArticleCollection articleCollection = articleCollectionRepository.findByArticleIdAndCollectionId(articleId, collectionId)
+        ArticleCollection articleCollection = articleCollectionRepository
+                .findByArticleIdAndCollectionId(articleId, collectionId)
                 .orElseThrow(() -> new RuntimeException("해당 컬렉션에 해당 articleId를 가진 아티클이 존재하지 않습니다."));
 
         articleCollectionRepository.deleteById(articleCollection.getId());
@@ -149,14 +151,15 @@ public class CollectionService {
     }
 
     /*
-    public void addArticleInCollection(Long collectionId, Long articleId) {
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다."));
-
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
-
-        articleCollectionRepository.save(new ArticleCollection(article, collection));
-    }
-    */
+     * public void addArticleInCollection(Long collectionId, Long articleId) {
+     * Collection collection = collectionRepository.findById(collectionId)
+     * .orElseThrow(() -> new
+     * RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다."));
+     * 
+     * Article article = articleRepository.findById(articleId)
+     * .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
+     * 
+     * articleCollectionRepository.save(new ArticleCollection(article, collection));
+     * }
+     */
 }

@@ -19,9 +19,6 @@ public class CollectionRequestDto {
     @NotNull
     private boolean isPublic;
 
-    @NotNull
-    private Long userId;
-
     private List<Long> articles;
 
     public Collection toEntity() {

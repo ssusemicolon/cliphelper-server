@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class BookmarkRequestDto {
-    @NotNull
-    private Long userId;
+
     @NotNull
     private Long collectionId;
 }
