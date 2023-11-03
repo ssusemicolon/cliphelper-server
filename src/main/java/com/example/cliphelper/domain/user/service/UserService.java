@@ -1,10 +1,12 @@
 package com.example.cliphelper.domain.user.service;
 
+import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
 import com.example.cliphelper.domain.user.dto.UserRequestDto;
 import com.example.cliphelper.domain.user.dto.UserResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
+import com.example.cliphelper.global.service.FileService;
 import com.example.cliphelper.global.utils.service.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+    private final FileService fileService;
     private final SecurityUtils securityUtils;
     private final UserRepository userRepository;
 
@@ -44,15 +47,24 @@ public class UserService {
     }
 
     /*
-    public UserResponseDto findUser(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("해당 이메일을 가진 회원이 존재하지 않습니다."));
-
-        return UserResponseDto.of(user);
-    }
-    */
+     * public UserResponseDto findUser(String email) {
+     * User user = userRepository.findByEmail(email)
+     * .orElseThrow(() -> new RuntimeException("해당 이메일을 가진 회원이 존재하지 않습니다."));
+     * return UserResponseDto.of(user);
+     * }
+     */
 
     public void deleteUser() {
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
+                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+
+        List<Article> articles = user.getArticles();
+        articles.forEach(article -> {
+            if (article.getFileUrl() != null) {
+                fileService.deleteFile(article.getTitle());
+            }
+        });
+
         userRepository.deleteById(securityUtils.getCurrentUserId());
     }
 

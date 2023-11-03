@@ -21,9 +21,11 @@ public class Article {
     @Column(name = "article_id")
     private Long id;
 
-    @NotBlank
     @Column(name = "url")
     private String url;
+
+    @Column(name = "file_url")
+    private String fileUrl;
 
     @NotBlank
     @Column(name = "title")
@@ -41,21 +43,24 @@ public class Article {
     @Column(name = "recent_access_time")
     private LocalDateTime recentAccessTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleTag> articleTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    public Article(String title, String url, String description, LocalDateTime createdAt, LocalDateTime recentAccessTime) {
+    public Article(String url, String title, String description,
+                   String memo, LocalDateTime createdAt, LocalDateTime recentAccessTime) {
         this.id = null;
-        this.title = title;
         this.url = url;
+        this.fileUrl = null;
+        this.title = title;
         this.description = description;
+        this.memo = memo;
         this.createdAt = createdAt;
         this.recentAccessTime = recentAccessTime;
     }
@@ -64,6 +69,10 @@ public class Article {
         if (user != null) {
             this.user = user;
         }
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
     public void changeUrl(String url) {

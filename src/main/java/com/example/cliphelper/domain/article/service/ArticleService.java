@@ -16,9 +16,11 @@ import com.example.cliphelper.domain.collection.repository.CollectionRepository;
 import com.example.cliphelper.domain.tag.repository.TagRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.domain.tag.service.TagService;
+import com.example.cliphelper.global.service.FileService;
 import com.example.cliphelper.global.utils.service.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +36,24 @@ public class ArticleService {
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final TagService tagService;
+    private final FileService fileService;
     private final SecurityUtils securityUtils;
 
-    public void createArticle(ArticleRequestDto articleRequestDto) {
-        // 여기서 해당 userId를 가진 회원이 존재하는지 여부를 확인하지 않는다.
-        // 왜냐면, JWT로 전달받았을 때, 이미 해당 토큰이 유효한지 검증한 이후이기 때문이다.
+    public void createArticle(ArticleRequestDto articleRequestDto, MultipartFile file) {
         Article article = articleRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElse(null);
         article.setUser(user);
+
+        // 스크랩 컨텐츠가 파일인 경우
+        if (file != null) {
+            String fileUrl = fileService.uploadFile(file);
+            article.setFileUrl(fileUrl);
+        }
+
         articleRepository.save(article);
 
-        // Tag 엔티티와 ArticleTag 엔티티 save
+        // Tag 엔티티, ArticleTag 엔티티 save
         tagService.registerTagInArticle(article, articleRequestDto.getTags());
     }
 
@@ -139,16 +147,18 @@ public class ArticleService {
 
     private void changeCollection(List<ArticleCollection> originalArticleCollectionList,
                                   List<ArticleCollection> modifiedArticleCollectionList) {
-        List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList.stream()
-                .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
-                .collect(Collectors.toList());
+        List<ArticleCollection> newArticleCollectionList =
+                modifiedArticleCollectionList.stream()
+                        .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
+                        .collect(Collectors.toList());
 
         newArticleCollectionList.forEach(articleCollection -> {
             articleCollectionRepository.save(articleCollection);
             articleCollection.getCollection().addArticleCount();
         });
 
-        List<ArticleCollection> deletedArticleCollectionList = originalArticleCollectionList.stream()
+        List<ArticleCollection> deletedArticleCollectionList =
+                originalArticleCollectionList.stream()
                 .filter(articleCollection -> !modifiedArticleCollectionList.contains(articleCollection))
                 .collect(Collectors.toList());
 
@@ -160,6 +170,12 @@ public class ArticleService {
 
     public void deleteArticle(Long articleId) {
         if (articleRepository.existsById(articleId)) {
+            Article article = articleRepository.findById(articleId).orElse(null);
+
+            // 파일 아티클인 경우 파일을 S3에서 삭제
+            if (article.getFileUrl() != null) {
+                fileService.deleteFile(article.getTitle());
+            }
             articleRepository.deleteById(articleId);
         } else {
             throw new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다.");
@@ -167,6 +183,10 @@ public class ArticleService {
     }
 
     private void changeArticleInfo(Article article, String url, String title, String description, String memo) {
+        if (article.getFileUrl() != null) {
+            throw new RuntimeException("파일 아티클은 수정할 수 없습니다.");
+        }
+
         article.changeUrl(url);
         article.changeTitle(title);
         article.changeDescription(description);
@@ -210,8 +230,6 @@ public class ArticleService {
             final ArticleTag articleTag = articleTagRepository.findByArticleIdAndTagId(article.getId(), tag.getId())
                     .orElse(null);
 
-            // 아래 2줄 대신 deleteById()를 이용해, 부모 객체 내 체크를 하는 행동을 제외하여 즉각적인 삭제를 할 수 있다.
-            // 이후 원주씨와 회의 예정
             article.getArticleTags().remove(articleTag);
             articleTagRepository.delete(articleTag);
         });

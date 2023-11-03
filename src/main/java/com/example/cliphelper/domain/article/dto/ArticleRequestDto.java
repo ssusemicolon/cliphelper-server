@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ArticleRequestDto {
-    @NotBlank
     private String url;
 
     @NotBlank
@@ -25,9 +24,10 @@ public class ArticleRequestDto {
     public Article toEntity() {
         LocalDateTime now = LocalDateTime.now();
         return new Article(
-                this.title,
                 this.url,
+                this.title,
                 this.description,
+                this.memo,
                 now,
                 now
         );

@@ -47,6 +47,13 @@ public enum ResultCode {
     BOOKMARK_MODIFY_SUCCESS("SB004", "입력한 collectionId의 북마크 컬렉션을 성공적으로 수정하였습니다."),
     BOOKMARK_DELETE_SUCCESS("SB005", "입력한 collectionId의 북마크 컬렉션을 성공적으로 삭제하였습니다."),
 
+
+    // 파일 관련
+    FILE_UPLOAD_SUCCESS("SF001", "해당 파일을 성공적으로 업로드하였습니다."),
+    FILE_DOWNLOAD_SUCCESS("SF002", "해당 파일을 성공적으로 다운로드하였습니다."),
+    FILE_DELETE_SUCCESS("SF005", "해당 파일을 성공적으로 삭제하였습니다."),
+
+
     // 푸시 알림 관련
     ALARM_SEND_SUCCESS("SAL001", "푸시 알림을 성공적으로 전송하였습니다."),
 

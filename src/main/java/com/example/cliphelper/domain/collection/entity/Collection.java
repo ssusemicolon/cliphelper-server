@@ -29,12 +29,12 @@ public class Collection {
     @Column(name = "is_public")
     private boolean isPublic;
 
+    @Column(name = "article_count")
+    private int articleCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @Column(name = "article_count")
-    private int articleCount;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
