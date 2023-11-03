@@ -12,9 +12,12 @@ import lombok.NoArgsConstructor;
 public class ArticleRequestDto {
     @NotBlank
     private String url;
+
     @NotBlank
     private String title;
+
     private String description;
+
     private String memo;
 
     private List<String> tags;

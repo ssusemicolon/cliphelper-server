@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserController {
     private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping("/admin/users")
     public ResultResponse findAllUsers() {
         List<UserResponseDto> userResponseDtos = userService.findAllUsers();
         return ResultResponse.of(ResultCode.ALL_USERS_FIND_SUCCESS, userResponseDtos);
@@ -31,10 +31,4 @@ public class AdminUserController {
      * return ResultResponse.of(ResultCode.USER_FIND_SUCCESS, userResponseDto);
      * }
      */
-
-    @DeleteMapping("/users/{userId}")
-    public ResultResponse deleteUser(@PathVariable("userId") Long userId) {
-        userService.deleteUser(userId);
-        return ResultResponse.of(ResultCode.USER_DELETE_SUCCESS);
-    }
 }

@@ -22,6 +22,7 @@ public class Tag {
     private Long id;
 
     @NotBlank
+    @Column(name = "name")
     private String name;
 
     public Tag(String name) {

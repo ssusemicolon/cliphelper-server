@@ -6,15 +6,7 @@ import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,23 +20,34 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
     private Long id;
+
     @NotBlank
+    @Column(name = "url")
     private String url;
+
     @NotBlank
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "memo")
     private String memo;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
     @Column(name = "recent_access_time")
     private LocalDateTime recentAccessTime;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleTag> articleTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -86,5 +89,4 @@ public class Article {
             this.memo = memo;
         }
     }
-
 }

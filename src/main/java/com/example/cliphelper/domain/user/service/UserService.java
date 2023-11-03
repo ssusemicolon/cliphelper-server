@@ -52,12 +52,12 @@ public class UserService {
     }
     */
 
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser() {
+        userRepository.deleteById(securityUtils.getCurrentUserId());
     }
 
-    public void modifyUser(Long userId, UserModifyRequestDto userModifyRequestDto) {
-        User user = userRepository.findById(userId)
+    public void modifyUser(UserModifyRequestDto userModifyRequestDto) {
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
 
         user.changeInfo(

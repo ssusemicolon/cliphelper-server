@@ -51,17 +51,15 @@ public class UserController {
      * }
      */
 
-    @PatchMapping("/users/{userId}")
-    public ResultResponse modifyUser(@PathVariable("userId") Long userId, @Valid @RequestBody UserModifyRequestDto userModifyRequestDto) {
-        userService.modifyUser(userId, userModifyRequestDto);
+    @PatchMapping("/users")
+    public ResultResponse modifyUser(@Valid @RequestBody UserModifyRequestDto userModifyRequestDto) {
+        userService.modifyUser(userModifyRequestDto);
         return ResultResponse.of(ResultCode.USER_MODIFY_SUCCESS);
     }
 
-    @DeleteMapping("/users/{userId}")
-    public ResultResponse deleteUser(@PathVariable("userId") Long userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/users")
+    public ResultResponse deleteUser() {
+        userService.deleteUser();
         return ResultResponse.of(ResultCode.USER_DELETE_SUCCESS);
     }
-
-
 }

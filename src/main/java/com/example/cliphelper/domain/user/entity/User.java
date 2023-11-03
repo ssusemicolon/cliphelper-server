@@ -1,6 +1,8 @@
 package com.example.cliphelper.domain.user.entity;
 
+import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.bookmark.entity.Bookmark;
+import com.example.cliphelper.domain.collection.entity.Collection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,18 +28,27 @@ public class User {
     private Long id;
 
     @Email
+    @Column(name = "email")
     private String email;
 
     @NotBlank
     // @Size(min = 8, max = 30)
+    @Column(name = "password")
     private String password;
 
     @NotBlank
     // @Size(min = 2, max = 20)
+    @Column(name = "username")
     private String username;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Article> articles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Collection> collections = new ArrayList<>();
 
     public User(String email, String password, String username) {
         this.id = null;

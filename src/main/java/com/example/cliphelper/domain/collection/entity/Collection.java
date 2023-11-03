@@ -4,16 +4,9 @@ import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,21 +20,24 @@ public class Collection {
     private Long id;
 
     @NotBlank
+    @Column(name = "title")
     private String title;
 
+    @Column(name = "description")
     private String description;
 
     @Column(name = "is_public")
     private boolean isPublic;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
-    private List<ArticleCollection> articleCollections;
-
+    @Column(name = "article_count")
     private int articleCount;
+
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    private List<ArticleCollection> articleCollections = new ArrayList<>();
 
     public Collection(String title, String description, boolean isPublic) {
         this.id = null;

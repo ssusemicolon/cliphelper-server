@@ -21,13 +21,13 @@ public class ArticleResponseDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss+09:00")
     private final LocalDateTime createdAt;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss+09:00")
     private final LocalDateTime recentAccessTime;
 
     // List<Tag> 형태로 쓸 경우, 전송 형태가 [ { id: 1, name: 스프링 }, { }, .. ]과 같음
     // 클라이언트에게 전달해줄 값은 name만이므로, List<String> 타입으로 선언함
     private final List<String> tags;
-
     private final Long userId;
 
     public static ArticleResponseDto of(Article article, List<String> tags) {

@@ -11,10 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class UserModifyRequestDto {
     @Email(message = "이메일 형식의 문자열을 입력해야 합니다.")
     private String email;
-
-
     private String password;
-
-
     private String username;
 }

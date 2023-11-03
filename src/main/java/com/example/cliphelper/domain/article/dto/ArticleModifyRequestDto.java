@@ -12,6 +12,5 @@ public class ArticleModifyRequestDto {
     private String title;
     private String description;
     private String memo;
-
     private List<String> tags;
 }
