@@ -1,5 +1,6 @@
 package com.example.cliphelper.controller;
 
+import com.example.cliphelper.dto.BookmarkResponseDto;
 import com.example.cliphelper.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.dto.CollectionRequestDto;
 import com.example.cliphelper.dto.CollectionResponseDto;
@@ -55,8 +56,8 @@ public class CollectionController {
     // 내가 북마크한 컬렉션 조회
     @GetMapping("/bookmarks")
     public ResultResponse readMyBookmarkCollections(@RequestParam("userId") Long userId) {
-        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyBookmarkCollections(userId);
-        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
+        List<BookmarkResponseDto> bookmarkResponseDtos = collectionService.readMyBookmarkCollections(userId);
+        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, bookmarkResponseDtos);
     }
 
     // 특정 컬렉션의 정보를 수정

@@ -1,5 +1,6 @@
 package com.example.cliphelper.service;
 
+import com.example.cliphelper.dto.BookmarkResponseDto;
 import com.example.cliphelper.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.dto.CollectionRequestDto;
 import com.example.cliphelper.dto.CollectionResponseDto;
@@ -95,11 +96,11 @@ public class CollectionService {
         return collectionResponseDtos;
     }
 
-    public List<CollectionResponseDto> readMyBookmarkCollections(Long userId) {
+    public List<BookmarkResponseDto> readMyBookmarkCollections(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
 
-        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
+        List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 
         List<Bookmark> bookmarks = user.getBookmarks();
         bookmarks.forEach(bookmark -> {
@@ -110,10 +111,10 @@ public class CollectionService {
                 Article article = articleCollection.getArticle();
                 articleIdList.add(article.getId());
             });
-            collectionResponseDtos.add(CollectionResponseDto.of(collection, articleIdList));
+            bookmarkResponseDtos.add(BookmarkResponseDto.of(collection, articleIdList));
         });
 
-        return collectionResponseDtos;
+        return bookmarkResponseDtos;
     }
 
     public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {

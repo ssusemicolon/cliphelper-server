@@ -1,7 +1,7 @@
 package com.example.cliphelper.dto;
 
 import com.example.cliphelper.entity.Collection;
-import lombok.Builder;
+import com.example.cliphelper.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -10,18 +10,11 @@ import java.util.List;
 
 @SuperBuilder
 @Getter
-@RequiredArgsConstructor
-public class CollectionResponseDto {
-    private final Long collectionId;
-    private final String title;
-    private final String description;
-    private final boolean isPublic;
-    private final List<Long> articles;
-    private final int articleCount;
-    private final Long userId;
+public class BookmarkResponseDto extends CollectionResponseDto {
+    private final User user;
 
-    public static CollectionResponseDto of(Collection collection, List<Long> articles) {
-        return CollectionResponseDto.builder()
+    public static BookmarkResponseDto of(Collection collection, List<Long> articles) {
+        return BookmarkResponseDto.builder()
                 .collectionId(collection.getId())
                 .title(collection.getTitle())
                 .description(collection.getDescription())
@@ -29,6 +22,7 @@ public class CollectionResponseDto {
                 .articles(articles)
                 .articleCount(collection.getArticleCount())
                 .userId(collection.getUser().getId())
+                .user(collection.getUser())
                 .build();
     }
 }
