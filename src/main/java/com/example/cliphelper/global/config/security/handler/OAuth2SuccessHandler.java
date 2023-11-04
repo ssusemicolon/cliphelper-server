@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -54,13 +53,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("{}", token);
 
         writeResponse(request, response, token);
-
-        // http://localhost:8080/oauth2/authorization/google
-
-        // targetUrl = UriComponentsBuilder.fromUriString("/home")
-        // .queryParam("token", "token")
-        // .build().toUriString();
-        // getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     public static void writeResponse(HttpServletRequest request, HttpServletResponse response, Object data)
