@@ -16,8 +16,9 @@ import com.example.cliphelper.domain.collection.repository.CollectionRepository;
 import com.example.cliphelper.domain.tag.repository.TagRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.domain.tag.service.TagService;
+import com.example.cliphelper.global.config.security.util.SecurityUtils;
 import com.example.cliphelper.global.service.FileService;
-import com.example.cliphelper.global.utils.service.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -146,19 +147,17 @@ public class ArticleService {
     }
 
     private void changeCollection(List<ArticleCollection> originalArticleCollectionList,
-                                  List<ArticleCollection> modifiedArticleCollectionList) {
-        List<ArticleCollection> newArticleCollectionList =
-                modifiedArticleCollectionList.stream()
-                        .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
-                        .collect(Collectors.toList());
+            List<ArticleCollection> modifiedArticleCollectionList) {
+        List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList.stream()
+                .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
+                .collect(Collectors.toList());
 
         newArticleCollectionList.forEach(articleCollection -> {
             articleCollectionRepository.save(articleCollection);
             articleCollection.getCollection().addArticleCount();
         });
 
-        List<ArticleCollection> deletedArticleCollectionList =
-                originalArticleCollectionList.stream()
+        List<ArticleCollection> deletedArticleCollectionList = originalArticleCollectionList.stream()
                 .filter(articleCollection -> !modifiedArticleCollectionList.contains(articleCollection))
                 .collect(Collectors.toList());
 

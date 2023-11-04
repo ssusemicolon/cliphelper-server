@@ -3,6 +3,8 @@ package com.example.cliphelper.domain.user.entity;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.bookmark.entity.Bookmark;
 import com.example.cliphelper.domain.collection.entity.Collection;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,14 +34,12 @@ public class User {
     private String email;
 
     @NotBlank
-    // @Size(min = 8, max = 30)
-    @Column(name = "password")
-    private String password;
-
-    @NotBlank
     // @Size(min = 2, max = 20)
     @Column(name = "username")
     private String username;
+
+    @Column(name = "picture")
+    private String picture;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Article> articles = new ArrayList<>();
@@ -50,27 +50,21 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Collection> collections = new ArrayList<>();
 
-    public User(String email, String password, String username) {
-        this.id = null;
+    @Builder
+    public User(String email, String username, String picture) {
         this.email = email;
-        this.password = password;
         this.username = username;
+        this.picture = picture;
     }
 
-    public void changeInfo(String email, String password, String username) {
+    public void changeInfo(String email, String username) {
         changeEmail(email);
-        changePassword(password);
         changeUsername(username);
     }
 
     private void changeEmail(String email) {
         if (this.email != null) {
             this.email = email;
-        }
-    }
-    private void changePassword(String password) {
-        if (this.password != null) {
-            this.password = password;
         }
     }
 
