@@ -6,8 +6,9 @@ import com.example.cliphelper.domain.user.dto.UserRequestDto;
 import com.example.cliphelper.domain.user.dto.UserResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
+import com.example.cliphelper.global.config.security.util.SecurityUtils;
 import com.example.cliphelper.global.service.FileService;
-import com.example.cliphelper.global.utils.service.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +40,8 @@ public class UserService {
         return userResponseDtos;
     }
 
-    public UserResponseDto findUser() {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
+    public UserResponseDto findUser(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
 
         return UserResponseDto.of(user);
@@ -74,21 +75,20 @@ public class UserService {
 
         user.changeInfo(
                 userModifyRequestDto.getEmail(),
-                userModifyRequestDto.getPassword(),
                 userModifyRequestDto.getUsername());
 
         userRepository.save(user);
     }
 
     /*
-    public UserProfileResponseDto getUserProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
-
-        // user 스크랩 개수
-        // user 북마크 개수
-        // user 팔로워
-        // 알림받을 시간 목록
-    }
+     * public UserProfileResponseDto getUserProfile(Long userId) {
+     * User user = userRepository.findById(userId)
+     * .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+     * 
+     * // user 스크랩 개수
+     * // user 북마크 개수
+     * // user 팔로워
+     * // 알림받을 시간 목록
+     * }
      */
 }

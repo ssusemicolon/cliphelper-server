@@ -7,7 +7,8 @@ import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.bookmark.repository.BookmarkRepository;
 import com.example.cliphelper.domain.collection.repository.CollectionRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
-import com.example.cliphelper.global.utils.service.SecurityUtils;
+import com.example.cliphelper.global.config.security.util.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
