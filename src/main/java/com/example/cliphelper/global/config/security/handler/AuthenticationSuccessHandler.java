@@ -21,6 +21,7 @@ import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.dto.JwtDto;
 import com.example.cliphelper.global.config.security.dto.UserDto;
 import com.example.cliphelper.global.config.security.token.JwtAuthenticationToken;
+import com.example.cliphelper.global.config.security.token.OAuthLoginToken;
 import com.example.cliphelper.global.config.security.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
@@ -38,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication)
             throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        OAuthLoginToken oAuth2User = (OAuthLoginToken) authentication;
         UserDto userDto = UserDto.from(oAuth2User);
 
         log.info("Principal에서 꺼낸 OAuth2User = {}", oAuth2User);
