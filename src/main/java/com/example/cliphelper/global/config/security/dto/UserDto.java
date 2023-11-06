@@ -23,10 +23,11 @@ public class UserDto {
     }
 
     public static UserDto from(OAuthLoginToken oauth2User) {
-        Map<String, Object> attributes = (Map<String, Object>) oauth2User.getPrincipal();
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
-        String picture = (String) attributes.get("picture");
+        final Object principal = oauth2User.getPrincipal();
+        final Map<String, Object> attributes = (Map<String, Object>) principal;
+        final String email = (String) attributes.get("email");
+        final String name = (String) attributes.get("name");
+        final String picture = (String) attributes.get("picture");
 
         return UserDto.builder().email(email).name(name).picture(picture).build();
 
