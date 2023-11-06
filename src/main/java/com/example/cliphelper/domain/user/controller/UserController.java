@@ -1,23 +1,23 @@
 package com.example.cliphelper.domain.user.controller;
 
-import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
-import com.example.cliphelper.domain.user.dto.UserRequestDto;
-import com.example.cliphelper.domain.user.dto.UserResponseDto;
-import com.example.cliphelper.global.config.security.util.SecurityUtils;
-import com.example.cliphelper.global.result.ResultCode;
-import com.example.cliphelper.global.result.ResultResponse;
-import com.example.cliphelper.domain.user.service.UserService;
-import lombok.RequiredArgsConstructor;
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.List;
+import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
+import com.example.cliphelper.domain.user.dto.UserRequestDto;
+import com.example.cliphelper.domain.user.dto.UserResponseDto;
+import com.example.cliphelper.domain.user.service.UserService;
+import com.example.cliphelper.global.config.security.util.SecurityUtils;
+import com.example.cliphelper.global.result.ResultCode;
+import com.example.cliphelper.global.result.ResultResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController

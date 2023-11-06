@@ -1,15 +1,16 @@
 package com.example.cliphelper.domain.user.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.cliphelper.domain.user.dto.UserResponseDto;
 import com.example.cliphelper.domain.user.service.UserService;
 import com.example.cliphelper.global.result.ResultCode;
 import com.example.cliphelper.global.result.ResultResponse;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController

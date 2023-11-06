@@ -2,6 +2,7 @@ package com.example.cliphelper.global.config.security.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private static final List<String> AUTH_WHITELIST = Arrays.asList(
+            "/auth/login", "/auth/reissue", "/auth/signup");
 
     public Authentication getAuthentication(UserDto member) {
         return new UsernamePasswordAuthenticationToken(member, "",
@@ -45,6 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.info("exception: " + be.getErrorCode());
             HandlerUtility.writeResponse(request, response, be.getErrorCode());
         }
-
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return AUTH_WHITELIST.contains(path);
+    }
+
 }

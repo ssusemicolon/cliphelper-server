@@ -1,9 +1,11 @@
 package com.example.cliphelper.global.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,11 +18,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.cliphelper.global.config.security.filter.JwtAuthenticationFilter;
+import com.example.cliphelper.global.config.security.filter.LoginAuthenticationFilter;
+import com.example.cliphelper.global.config.security.handler.AuthenticationSuccessHandler;
 import com.example.cliphelper.global.config.security.handler.CustomAccessDeniedHandler;
 import com.example.cliphelper.global.config.security.handler.CustomAuthenticationEntryPoint;
 import com.example.cliphelper.global.config.security.handler.CustomAuthenticationFailureHandler;
-import com.example.cliphelper.global.config.security.handler.OAuth2SuccessHandler;
-import com.example.cliphelper.global.config.security.service.CustomOAuth2UserService;
+import com.example.cliphelper.global.config.security.provider.LoginAuthenticationProvider;
 import com.example.cliphelper.global.config.security.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -31,15 +34,24 @@ import lombok.RequiredArgsConstructor;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
         private final JwtUtil jwtUtil;
-        private final CustomOAuth2UserService oAuth2UserService;
-        private final OAuth2SuccessHandler oAuth2SuccessHandler;
+        private final AuthenticationSuccessHandler authenticationSuccessHandler;
         private final CustomAuthenticationFailureHandler authenticationFailureHandler;
         private final CustomAuthenticationEntryPoint authenticationEntryPoint;
         private final CustomAccessDeniedHandler accessDeniedHandler;
+        private final LoginAuthenticationProvider loginAuthenticationProvider;
+
+        // filters
+        public LoginAuthenticationFilter loginAuthenticationFilter() {
+                final LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
+                filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+                filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+                filter.setAuthenticationManager(authenticationManager());
+                return filter;
+        }
 
         @Bean
-        AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-                return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+        AuthenticationManager authenticationManager() {
+                return new ProviderManager(Arrays.asList(loginAuthenticationProvider));
         }
 
         @Bean
@@ -72,14 +84,13 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf.disable())
                                 .sessionManagement(management -> management
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authorizeRequests(requests -> requests.antMatchers("/token/**").permitAll()
-                                                .anyRequest().authenticated())
+                                .authorizeRequests(
+                                                requests -> requests.antMatchers().permitAll()
+                                                                .anyRequest().authenticated())
                                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
                                                 UsernamePasswordAuthenticationFilter.class)
-                                .oauth2Login(login -> login
-                                                .successHandler(oAuth2SuccessHandler)
-                                                .failureHandler(authenticationFailureHandler)
-                                                .userInfoEndpoint().userService(oAuth2UserService))
+                                .addFilterBefore(loginAuthenticationFilter(),
+                                                JwtAuthenticationFilter.class)
                                 .exceptionHandling(handling -> handling
                                                 .authenticationEntryPoint(authenticationEntryPoint)
                                                 .accessDeniedHandler(accessDeniedHandler))
