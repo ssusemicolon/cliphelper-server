@@ -15,6 +15,7 @@ import java.util.List;
 public class ArticleResponseDto {
     private final Long articleId;
     private final String url;
+    private final String fileUrl;
     private final String title;
     private final String description;
     private final String memo;
@@ -34,6 +35,7 @@ public class ArticleResponseDto {
         return ArticleResponseDto.builder()
                 .articleId(article.getId())
                 .url(article.getUrl())
+                .fileUrl(article.getFileUrl())
                 .title(article.getTitle())
                 .description(article.getDescription())
                 .memo(article.getMemo())

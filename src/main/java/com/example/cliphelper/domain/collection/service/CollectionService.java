@@ -14,12 +14,13 @@ import com.example.cliphelper.domain.article.repository.ArticleRepository;
 import com.example.cliphelper.domain.collection.repository.CollectionRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.example.cliphelper.global.error.ErrorCode;
+import com.example.cliphelper.global.error.exception.ArticleNotInCollectionException;
+import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -35,13 +36,13 @@ public class CollectionService {
     public void createCollection(CollectionRequestDto collectionRequestDto) {
         Collection collection = collectionRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
         collection.setUser(user);
         collectionRepository.save(collection);
 
         collectionRequestDto.getArticles().forEach(articleId -> {
             Article article = articleRepository.findById(articleId)
-                    .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
+                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
             ArticleCollection articleCollection = new ArticleCollection(article, collection);
             articleCollectionRepository.save(articleCollection);
@@ -71,7 +72,7 @@ public class CollectionService {
 
     public CollectionResponseDto readCollection(Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
 
         List<Long> articleIdList = new ArrayList<>();
         collection.getArticleCollections().forEach(articleCollection -> {
@@ -100,7 +101,7 @@ public class CollectionService {
 
     public List<BookmarkResponseDto> readMyBookmarkCollections() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 
@@ -121,7 +122,7 @@ public class CollectionService {
 
     public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {
         Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
         collection.changeInfo(
                 collectionModifyRequestDto.getTitle(),
@@ -133,12 +134,12 @@ public class CollectionService {
 
     public void deleteArticleInCollection(Long collectionId, Long articleId) {
         if (!collectionRepository.existsById(collectionId)) {
-            throw new RuntimeException("해당 collecitonId를 가진 컬렉션이 존재하지 않습니다.");
+            throw new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND);
         }
 
         ArticleCollection articleCollection = articleCollectionRepository
                 .findByArticleIdAndCollectionId(articleId, collectionId)
-                .orElseThrow(() -> new RuntimeException("해당 컬렉션에 해당 articleId를 가진 아티클이 존재하지 않습니다."));
+                .orElseThrow(() -> new ArticleNotInCollectionException(ErrorCode.ARTICLE_IS_NOT_IN_COLLECTION));
 
         articleCollectionRepository.deleteById(articleCollection.getId());
     }
@@ -147,7 +148,7 @@ public class CollectionService {
         if (collectionRepository.existsById(collectionId)) {
             collectionRepository.deleteById(collectionId);
         } else {
-            throw new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다.");
+            throw new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND);
         }
     }
 

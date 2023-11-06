@@ -7,6 +7,8 @@ import com.example.cliphelper.domain.user.dto.UserResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
+import com.example.cliphelper.global.error.ErrorCode;
+import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import com.example.cliphelper.global.service.FileService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +44,7 @@ public class UserService {
 
     public UserResponseDto findUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         return UserResponseDto.of(user);
     }
@@ -57,7 +59,7 @@ public class UserService {
 
     public void deleteUser() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         List<Article> articles = user.getArticles();
         articles.forEach(article -> {
@@ -71,7 +73,7 @@ public class UserService {
 
     public void modifyUser(UserModifyRequestDto userModifyRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         user.changeInfo(
                 userModifyRequestDto.getEmail(),
