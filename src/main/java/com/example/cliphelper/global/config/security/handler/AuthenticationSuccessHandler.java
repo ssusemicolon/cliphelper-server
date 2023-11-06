@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -41,17 +40,12 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
             throws IOException, ServletException {
         OAuthLoginToken oAuth2User = (OAuthLoginToken) authentication;
         UserDto userDto = UserDto.from(oAuth2User);
-
-        log.info("Principal에서 꺼낸 OAuth2User = {}", oAuth2User);
-
-        // 최초 로그인이라면 회원가입 처리를 한다.
-        log.info("토큰 발행 시작");
-
         Long userId = getOrSaveUser(userDto);
+
+        log.info("on authentication success! userId: {}", userId);
 
         JwtDto token = jwtUtil.createJwt(new JwtAuthenticationToken(userId, "",
                 List.of("ROLE_USER").stream().map(SimpleGrantedAuthority::new).toList()));
-        log.info("{}", token);
 
         writeResponse(request, response, token);
     }
@@ -83,6 +77,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
             return optionalUser.get().getId();
         }
 
+        log.info("new user signup! email: {}", email);
         User user = User.builder().username(username).email(email).picture(profile).build();
         user = this.userRepository.save(user);
 

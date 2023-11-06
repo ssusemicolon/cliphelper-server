@@ -45,11 +45,8 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
 
     private OAuthLoginToken verify(Authentication authentication) {
         try {
-
             final OAuthType oAuthType = (OAuthType) authentication.getPrincipal();
             final String key = (String) authentication.getCredentials();
-
-            log.info("oauth type: {}, key: {}", oAuthType, key);
 
             if (oAuthType == null || key == null) {
                 return null;
@@ -62,6 +59,7 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
                     return kakaoVerify(key);
             }
         } catch (FeignException fe) {
+            log.info("feign exception fe: {}", fe);
             throw new LoginFailedException();
         }
 
@@ -69,40 +67,31 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
     }
 
     private OAuthLoginToken googleVerify(String key) {
-        // GoogleOAuthResult result = googleClient.verify(key);
-        // final String username = result.getName();
-        // final String userEmail = result.getEmail();
-        // final String picture = result.getPicture();
+        GoogleOAuthResult result = googleClient.verify(key);
+        final String username = result.getName();
+        final String userEmail = result.getEmail();
+        final String picture = result.getPicture();
 
-        final String username = "테스트유저";
-        final String userEmail = "hi@naver.com";
-        final String picture = "test.picture";
-
-        log.info("picture: {}", picture);
-        log.info("username: {}", username);
-
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("email", userEmail);
-        attributes.put("picture", picture);
-        attributes.put("name", username);
-
-        var ret = new OAuthLoginToken(attributes, null);
-        log.info("ret: {}, {}", ret.getCredentials(), ret.getPrincipal());
-
-        return ret;
+        final Map<String, Object> attributes = createAttributeMap(username, userEmail, picture);
+        return new OAuthLoginToken(attributes, null);
     }
 
     private OAuthLoginToken kakaoVerify(String key) {
-        KakaoOAuthResult result = kakaoClient.verify(key);
+        KakaoOAuthResult result = kakaoClient.verify("Bearer " + key);
         final String username = result.getProperties().getNickname();
         final String userEmail = result.getKakao_account().getEmail();
         final String picture = result.getProperties().getProfile_image();
 
+        final Map<String, Object> attributes = createAttributeMap(username, userEmail, picture);
+        return new OAuthLoginToken(attributes, null);
+    }
+
+    private Map<String, Object> createAttributeMap(String username, String userEmail, String picture) {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("email", userEmail);
         attributes.put("picture", picture);
         attributes.put("name", username);
 
-        return new OAuthLoginToken(userEmail, attributes);
+        return attributes;
     }
 }
