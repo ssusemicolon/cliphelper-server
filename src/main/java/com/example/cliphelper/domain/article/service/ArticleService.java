@@ -17,6 +17,9 @@ import com.example.cliphelper.domain.tag.repository.TagRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.domain.tag.service.TagService;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
+import com.example.cliphelper.global.error.ErrorCode;
+import com.example.cliphelper.global.error.exception.EntityNotFoundException;
+import com.example.cliphelper.global.error.exception.FileNotModifiedException;
 import com.example.cliphelper.global.service.FileService;
 
 import lombok.RequiredArgsConstructor;
@@ -98,7 +101,7 @@ public class ArticleService {
 
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
         List<ArticleTag> articleTags = article.getArticleTags();
         List<String> tags = new ArrayList<>();
@@ -113,7 +116,7 @@ public class ArticleService {
 
     public void modifyArticle(Long articleId, ArticleModifyRequestDto articleModifyRequestDto) {
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
         changeArticleInfo(article,
                 articleModifyRequestDto.getUrl(),
@@ -128,14 +131,14 @@ public class ArticleService {
 
     public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("해당 articleId를 가진 아티클이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
         List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
 
         List<ArticleCollection> modifiedArticleCollectionList = new ArrayList<>();
         collectionIdList.forEach(collectionId -> {
             Collection collection = collectionRepository.findById(collectionId)
-                    .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 아티클이 존재하지 않습니다."));
+                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
             ArticleCollection articleCollection = articleCollectionRepository
                     .findByArticleIdAndCollectionId(articleId, collectionId)
@@ -177,13 +180,13 @@ public class ArticleService {
             }
             articleRepository.deleteById(articleId);
         } else {
-            throw new RuntimeException("해당 articleId를 가진 스크랩 컨텐츠가 존재하지 않습니다.");
+            throw new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND);
         }
     }
 
     private void changeArticleInfo(Article article, String url, String title, String description, String memo) {
         if (article.getFileUrl() != null) {
-            throw new RuntimeException("파일 아티클은 수정할 수 없습니다.");
+            throw new FileNotModifiedException(ErrorCode.FILE_CANNOT_MODIFIED);
         }
 
         article.changeUrl(url);

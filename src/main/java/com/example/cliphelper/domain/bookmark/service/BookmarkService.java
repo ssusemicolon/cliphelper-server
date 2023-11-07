@@ -9,6 +9,9 @@ import com.example.cliphelper.domain.collection.repository.CollectionRepository;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
 
+import com.example.cliphelper.global.error.ErrorCode;
+import com.example.cliphelper.global.error.exception.BookmarkMyselfException;
+import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +25,14 @@ public class BookmarkService {
 
     public void addBookmark(BookmarkRequestDto bookmarkRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Collection collection = collectionRepository.findById(bookmarkRequestDto.getCollectionId())
-                .orElseThrow(() -> new RuntimeException("해당 collectionId를 가진 컬렉션이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
 
-        // 자신의 컬렉션을 북마크하려는 경우, 예외 발생
         if (collection.getUser() == user) {
-            throw new RuntimeException("자신의 컬렉션을 북마크할 수 없습니다.");
+            throw new BookmarkMyselfException(ErrorCode.CANNOT_BOOKMARK_MY_COLLECTION);
         }
-
         bookmarkRepository.save(new Bookmark(user, collection));
     }
 

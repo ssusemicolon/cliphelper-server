@@ -20,7 +20,8 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping(value = "/articles", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResultResponse registerArticle(@Valid @RequestPart ArticleRequestDto articleRequestDto, @RequestPart(required = false) MultipartFile file) {
+    public ResultResponse registerArticle(@Valid @RequestPart ArticleRequestDto articleRequestDto,
+                                          @RequestPart(required = false) MultipartFile file) {
         articleService.createArticle(articleRequestDto, file);
         return ResultResponse.of(ResultCode.ARTICLE_CREATE_SUCCESS);
     }
