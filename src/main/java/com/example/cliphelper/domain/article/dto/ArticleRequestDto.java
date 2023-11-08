@@ -1,20 +1,23 @@
 package com.example.cliphelper.domain.article.dto;
 
 import com.example.cliphelper.domain.article.entity.Article;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class ArticleRequestDto {
     private String url;
 
     private String thumbnail;
 
-    @NotBlank
+    private MultipartFile file;
+
     private String title;
 
     private String description;

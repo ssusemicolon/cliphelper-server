@@ -3,11 +3,14 @@ package com.example.cliphelper.domain.article.controller;
 import com.example.cliphelper.domain.article.dto.ArticleModifyRequestDto;
 import com.example.cliphelper.domain.article.dto.ArticleRequestDto;
 import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
+import com.example.cliphelper.global.error.BusinessException;
+import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.result.ResultCode;
 import com.example.cliphelper.global.result.ResultResponse;
 import com.example.cliphelper.domain.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,12 +22,17 @@ import java.util.List;
 public class ArticleController {
     private final ArticleService articleService;
 
-    @PostMapping(value = "/articles", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResultResponse registerArticle(@Valid @RequestPart ArticleRequestDto articleRequestDto,
-                                          @RequestPart(required = false) MultipartFile file) {
-        articleService.createArticle(articleRequestDto, file);
+    @PostMapping(value = "/articles", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResultResponse registerArticle(@ModelAttribute ArticleRequestDto articleRequestDto) {
+        if (articleRequestDto.getTitle().isBlank()) {
+            throw new BusinessException(ErrorCode.ARTICLE_TITLE_IS_BLANK);
+        }
+
+        articleService.createArticle(articleRequestDto);
         return ResultResponse.of(ResultCode.ARTICLE_CREATE_SUCCESS);
     }
+
+    //======================
 
     // 관리자 전용 API
     @GetMapping("/admin/articles")

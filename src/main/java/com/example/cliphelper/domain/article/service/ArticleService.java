@@ -44,13 +44,16 @@ public class ArticleService {
     private final FileService fileService;
     private final SecurityUtils securityUtils;
 
-    public void createArticle(ArticleRequestDto articleRequestDto, MultipartFile file) {
+    public void createArticle(ArticleRequestDto articleRequestDto) {
         Article article = articleRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
         article.setUser(user);
 
+        System.out.println("======articleRequestDto.getTitle():" + articleRequestDto.getTitle());
+
         // 스크랩 컨텐츠가 파일인 경우
+        MultipartFile file = articleRequestDto.getFile();
         if (file != null) {
             String uuid = UUID.randomUUID().toString();
             String fileUrl = fileService.uploadFile(file, uuid);
