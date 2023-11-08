@@ -1,5 +1,6 @@
 package com.example.cliphelper.domain.collection.controller;
 
+import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
 import com.example.cliphelper.domain.collection.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -49,6 +51,12 @@ public class CollectionController {
     public ResultResponse readMyCollections() {
         List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyCollections();
         return ResultResponse.of(ResultCode.MY_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
+    }
+
+    @GetMapping("/collections/other")
+    public ResultResponse readOtherCollections(/*@RequestParam("type") String type*/) {
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readOtherCollections();
+        return ResultResponse.of(ResultCode.OTHER_COLLECTIONS_FIND_SUCCESS, collectionResponseDtos);
     }
 
     // 특정 컬렉션의 정보를 수정

@@ -10,4 +10,6 @@ import java.util.List;
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     List<Article> findByUserId(Long userId);
+
+    List<Article> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

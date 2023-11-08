@@ -1,5 +1,6 @@
 package com.example.cliphelper.domain.collection.entity;
 
+import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -45,6 +47,13 @@ public class Collection {
         this.description = description;
         this.isPublic = isPublic;
         this.articleCount = 0;
+    }
+
+    public List<Article> getArticles() {
+        return this.articleCollections
+                .stream()
+                .map(articleCollection -> articleCollection.getArticle())
+                .collect(Collectors.toList());
     }
 
     public void setUser(User user) {

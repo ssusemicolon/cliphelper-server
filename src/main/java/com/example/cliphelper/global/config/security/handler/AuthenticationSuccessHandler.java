@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
         log.info("on authentication success! userId: {}", userId);
 
         JwtDto token = jwtUtil.createJwt(new JwtAuthenticationToken(userId, "",
-                List.of("ROLE_USER").stream().map(SimpleGrantedAuthority::new).toList()));
+                List.of("ROLE_USER").stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())));
 
         writeResponse(request, response, token);
     }

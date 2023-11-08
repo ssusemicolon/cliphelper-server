@@ -59,12 +59,7 @@ public class CollectionService {
         List<Collection> collections = collectionRepository.findAll();
 
         collections.forEach(collection -> {
-            List<Long> articleIdList = new ArrayList<>();
-            collection.getArticleCollections().forEach(articleCollection -> {
-                Article article = articleCollection.getArticle();
-                articleIdList.add(article.getId());
-            });
-            collectionResponseDtos.add(CollectionResponseDto.of(collection, articleIdList));
+            collectionResponseDtos.add(CollectionResponseDto.of(collection));
         });
 
         return collectionResponseDtos;
@@ -74,28 +69,22 @@ public class CollectionService {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
 
-        List<Long> articleIdList = new ArrayList<>();
-        collection.getArticleCollections().forEach(articleCollection -> {
-            Article article = articleCollection.getArticle();
-            articleIdList.add(article.getId());
-        });
-
-        return CollectionResponseDto.of(collection, articleIdList);
+        return CollectionResponseDto.of(collection);
     }
 
     public List<CollectionResponseDto> readMyCollections() {
         List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
         List<Collection> collections = collectionRepository.findByUserId(securityUtils.getCurrentUserId());
 
-        collections.forEach(collection -> {
-            List<Long> articleIdList = new ArrayList<>();
-            collection.getArticleCollections().forEach(articleCollection -> {
-                Article article = articleCollection.getArticle();
-                articleIdList.add(article.getId());
-            });
-            collectionResponseDtos.add(CollectionResponseDto.of(collection, articleIdList));
-        });
+        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
+        return collectionResponseDtos;
+    }
 
+    public List<CollectionResponseDto> readOtherCollections() {
+        List<Collection> collections = collectionRepository.findByUserIdNotAndIsPublicIsTrue(securityUtils.getCurrentUserId());
+        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
+
+        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
         return collectionResponseDtos;
     }
 
@@ -108,13 +97,7 @@ public class CollectionService {
         List<Bookmark> bookmarks = user.getBookmarks();
         bookmarks.forEach(bookmark -> {
             Collection collection = bookmark.getCollection();
-            List<Long> articleIdList = new ArrayList<>();
-
-            collection.getArticleCollections().forEach(articleCollection -> {
-                Article article = articleCollection.getArticle();
-                articleIdList.add(article.getId());
-            });
-            bookmarkResponseDtos.add(BookmarkResponseDto.of(collection, articleIdList));
+            bookmarkResponseDtos.add(BookmarkResponseDto.of(collection));
         });
 
         return bookmarkResponseDtos;

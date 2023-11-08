@@ -9,6 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ArticleModifyRequestDto {
     private String url;
+    private String thumbnail;
     private String title;
     private String description;
     private String memo;

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class ArticleRequestDto {
     private String url;
 
+    private String thumbnail;
+
     @NotBlank
     private String title;
 
@@ -25,6 +27,7 @@ public class ArticleRequestDto {
         LocalDateTime now = LocalDateTime.now();
         return new Article(
                 this.url,
+                this.thumbnail,
                 this.title,
                 this.description,
                 this.memo,

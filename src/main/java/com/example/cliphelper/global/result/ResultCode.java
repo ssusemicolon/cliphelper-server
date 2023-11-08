@@ -21,23 +21,24 @@ public enum ResultCode {
     USER_FIND_SUCCESS(200, "SU003", "회원을 성공적으로 조회하였습니다."),
     ALL_USERS_FIND_SUCCESS(200, "SU004", "모든 회원들을 성공적으로 조회하였습니다."),
     USER_MODIFY_SUCCESS(200, "SU005", "회원의 정보를 성공적으로 수정하였습니다."),
-    USER_DELETE_SUCCESS(200, "SU006", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
+    USER_DELETE_SUCCESS(200, "SU010", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
 
     // 아티클(200, 스크랩 컨텐츠 관련)
     ARTICLE_CREATE_SUCCESS(200, "SA001", "입력한 아티클을 성공적으로 등록하였습니다."),
     ARTICLE_FIND_SUCCESS(200, "SA002", "입력한 articleId의 아티클을 성공적으로 조회하였습니다."),
     ALL_ARTICLES_FIND_SUCCESS(200, "SA003", "아티클 목록을 성공적으로 조회하였습니다."),
     ARTICLE_MODIFY_SUCCESS(200, "SA004", "입력한 postId의 아티클을 성공적으로 수정하였습니다."),
-    ARTICLE_DELETE_SUCCESS(200, "SA005", "입력한 postId의 아티클을 성공적으로 삭제하였습니다"),
+    ARTICLE_DELETE_SUCCESS(200, "SA010", "입력한 postId의 아티클을 성공적으로 삭제하였습니다"),
 
     // 컬렉션 관련
     COLLECTION_CREATE_SUCCESS(200, "SC001", "입력한 컬렉션을 성공적으로 생성하였습니다."),
     COLLECTION_FIND_SUCCESS(200, "SC002", "입력한 articleId의 아티클을 성공적으로 조회하였습니다."),
     ALL_COLLECTIONS_FIND_SUCCESS(200, "SC003", "전체 컬렉션 목록을 성공적으로 조회하였습니다."),
     MY_COLLECTIONS_FIND_SUCCESS(200, "SC004", "내 컬렉션 목록을 성공적으로 조회하였습니다."),
-    COLLECTION_MODIFY_SUCCESS(200, "SC005", "입력한 collectionId의 컬렉션을 성공적으로 수정하였습니다."),
-    COLLECTION_DELETE_SUCCESS(200, "SC006", "입력한 collectionId의 컬렉션을 성공적으로 삭제하였습니다"),
-    ARTICLE_ADD_TO_COLLECTION_SUCCESS(200, "SC007", "해당 아티클을 컬렉션에 성공적으로 추가하였습니다."),
+    OTHER_COLLECTIONS_FIND_SUCCESS(200, "SC005", "다른 회원들의 컬렉션 목록을 성공적으로 조회하였습니다."),
+    COLLECTION_MODIFY_SUCCESS(200, "SC006", "입력한 collectionId의 컬렉션을 성공적으로 수정하였습니다."),
+    COLLECTION_DELETE_SUCCESS(200, "SC010", "입력한 collectionId의 컬렉션을 성공적으로 삭제하였습니다"),
+    ARTICLE_ADD_TO_COLLECTION_SUCCESS(200, "SC011", "해당 아티클을 컬렉션에 성공적으로 추가하였습니다."),
 
     // 북마크 관련,
     BOOKMARK_COLLECTION_SUCCESS(200, "SB001", "선택한 컬렉션을 성공적으로 북마크하였습니다."),
@@ -45,7 +46,7 @@ public enum ResultCode {
     ALL_BOOKMARKS_FIND_SUCCESS(200, "SB003", "모든 북마크 컬렉션 목록을 성공적으로 조회하였습니다."),
     MY_BOOKMARKS_FIND_SUCCESS(200, "SB000", "사용자의 모든 북마크 컬렉션 목록을 성공적으로 조회하였습니다."),
     BOOKMARK_MODIFY_SUCCESS(200, "SB004", "입력한 collectionId의 북마크 컬렉션을 성공적으로 수정하였습니다."),
-    BOOKMARK_DELETE_SUCCESS(200, "SB005", "입력한 collectionId의 북마크 컬렉션을 성공적으로 삭제하였습니다."),
+    BOOKMARK_DELETE_SUCCESS(200, "SB010", "입력한 collectionId의 북마크 컬렉션을 성공적으로 삭제하였습니다."),
 
     // 파일 관련
     FILE_UPLOAD_SUCCESS(200, "SF001", "해당 파일을 성공적으로 업로드하였습니다."),

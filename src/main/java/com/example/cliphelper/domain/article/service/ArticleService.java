@@ -46,7 +46,7 @@ public class ArticleService {
     public void createArticle(ArticleRequestDto articleRequestDto, MultipartFile file) {
         Article article = articleRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
         article.setUser(user);
 
         // 스크랩 컨텐츠가 파일인 경우
@@ -63,55 +63,20 @@ public class ArticleService {
 
     public List<ArticleResponseDto> findAllArticles() {
         List<Article> articles = articleRepository.findAll();
-        List<ArticleResponseDto> articleResponseDtos = new ArrayList<>();
-
-        articles.forEach(article -> {
-            List<ArticleTag> articleTags = article.getArticleTags();
-            List<String> tags = new ArrayList<>();
-
-            articleTags.forEach(articleTag -> {
-                Tag tag = articleTag.getTag();
-                tags.add(tag.getName());
-            });
-
-            articleResponseDtos.add(ArticleResponseDto.of(article, tags));
-        });
-
-        return articleResponseDtos;
+        return ArticleResponseDto.ofList(articles);
     }
 
     public List<ArticleResponseDto> findMyArticles() {
-        List<Article> articles = articleRepository.findByUserId(securityUtils.getCurrentUserId());
-        List<ArticleResponseDto> articleResponseDtos = new ArrayList<>();
-
-        articles.forEach(article -> {
-            List<ArticleTag> articleTags = article.getArticleTags();
-            List<String> tags = new ArrayList<>();
-
-            articleTags.forEach(articleTag -> {
-                Tag tag = articleTag.getTag();
-                tags.add(tag.getName());
-            });
-
-            articleResponseDtos.add(ArticleResponseDto.of(article, tags));
-        });
-
-        return articleResponseDtos;
+        List<Article> articles = articleRepository.
+                findByUserIdOrderByCreatedAtDesc(securityUtils.getCurrentUserId());
+        return ArticleResponseDto.ofList(articles);
     }
 
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
-        List<ArticleTag> articleTags = article.getArticleTags();
-        List<String> tags = new ArrayList<>();
-
-        articleTags.forEach(articleTag -> {
-            Tag tag = articleTag.getTag();
-            tags.add(tag.getName());
-        });
-
-        return ArticleResponseDto.of(article, tags);
+        return ArticleResponseDto.of(article);
     }
 
     public void modifyArticle(Long articleId, ArticleModifyRequestDto articleModifyRequestDto) {
@@ -120,9 +85,11 @@ public class ArticleService {
 
         changeArticleInfo(article,
                 articleModifyRequestDto.getUrl(),
+                articleModifyRequestDto.getThumbnail(),
                 articleModifyRequestDto.getTitle(),
                 articleModifyRequestDto.getDescription(),
-                articleModifyRequestDto.getMemo());
+                articleModifyRequestDto.getMemo()
+        );
 
         changeTags(article, articleModifyRequestDto.getTags());
 
@@ -184,28 +151,29 @@ public class ArticleService {
         }
     }
 
-    private void changeArticleInfo(Article article, String url, String title, String description, String memo) {
+    private void changeArticleInfo(Article article, String url, String thumbnail, String title, String description, String memo) {
         if (article.getFileUrl() != null) {
             throw new FileNotModifiedException(ErrorCode.FILE_CANNOT_MODIFIED);
         }
 
         article.changeUrl(url);
+        article.changeThumbnail(thumbnail);
         article.changeTitle(title);
         article.changeDescription(description);
         article.changeMemo(memo);
     }
 
     private void changeTags(Article article, List<String> modifiedTagNames) {
-        List<ArticleTag> articleTags = article.getArticleTags();
-
-        List<Tag> originalTags = new ArrayList<>();
-        articleTags.forEach(articleTag -> {
-            originalTags.add(articleTag.getTag());
-        });
+        List<Tag> originalTags = article.getTags()
+                .stream()
+                .map(tagName -> tagRepository.findByName(tagName)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.TAG_NOT_FOUND)))
+                .collect(Collectors.toList());
 
         List<Tag> modifiedTags = new ArrayList<>();
         modifiedTagNames.forEach(name -> {
-            Tag tag = tagRepository.findByName(name).orElse(null);
+            Tag tag = tagRepository.findByName(name)
+                    .orElse(null);
             if (tag == null) {
                 tag = new Tag(name);
                 tagRepository.save(tag);

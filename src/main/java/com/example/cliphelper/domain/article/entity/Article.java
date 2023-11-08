@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -26,6 +27,9 @@ public class Article {
 
     @Column(name = "file_url")
     private String fileUrl;
+
+    @Column(name = "thumbnail")
+    private String thumbnail;
 
     @NotBlank
     @Column(name = "title")
@@ -53,11 +57,12 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
 
-    public Article(String url, String title, String description,
+    public Article(String url, String thumbnail, String title, String description,
                    String memo, LocalDateTime createdAt, LocalDateTime recentAccessTime) {
         this.id = null;
         this.url = url;
         this.fileUrl = null;
+        this.thumbnail = thumbnail;
         this.title = title;
         this.description = description;
         this.memo = memo;
@@ -81,6 +86,12 @@ public class Article {
         }
     }
 
+    public void changeThumbnail(String thumbnail) {
+        if (thumbnail != null) {
+            this.thumbnail = thumbnail;
+        }
+    }
+
     public void changeTitle(String title) {
         if (title != null) {
             this.title = title;
@@ -97,5 +108,13 @@ public class Article {
         if (memo != null) {
             this.memo = memo;
         }
+    }
+
+    public List<String> getTags() {
+        return this.articleTags
+                .stream()
+                .map(articleTag -> articleTag.getTag().getName())
+                .collect(Collectors.toList());
+
     }
 }

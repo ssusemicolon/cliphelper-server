@@ -32,6 +32,9 @@ public enum ErrorCode {
     FILE_CANNOT_UPLOAD(400, "EF001", "해당 파일을 업로드할 수 없습니다."),
     FILE_CANNOT_MODIFIED(400, "EF002", "파일 아티클은 수정할 수 없습니다."),
 
+    // 태그
+    TAG_NOT_FOUND(404, "ET001", "해당 태그가 존재하지 않습니다."),
+
     // 컬렉션
     COLLECTION_NOT_FOUND(404, "EC001", "해당 컬렉션이 존재하지 않습니다."),
     ARTICLE_IS_NOT_IN_COLLECTION(400, "EC002", "해당 컬렉션에 해당 articleId를 가진 아티클이 존재하지 않습니다."),
