@@ -2,12 +2,15 @@ package com.example.cliphelper.global.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.cliphelper.global.error.BusinessException;
+import com.example.cliphelper.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -17,7 +20,7 @@ public class FileService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadFile(MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile, String uuid) {
         System.out.println("주입받은 amzonS3Client 객체: " + amazonS3);
         String originalFilename = multipartFile.getOriginalFilename();
 
@@ -25,21 +28,22 @@ public class FileService {
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
 
+        final int UUID_LENGTH = 36;
+        String filename = uuid + originalFilename;
         try {
-            amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
+            amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), metadata);
         } catch (IOException e) {
-            System.out.println("=========파일 저장 중 에러 발생===========");
-            throw new RuntimeException(e.getMessage());
+            throw new BusinessException(ErrorCode.FILE_CANNOT_UPLOAD);
         }
 
-        return amazonS3.getUrl(bucket, originalFilename).toString();
+        return amazonS3.getUrl(bucket, filename).toString();
     }
 
-    public String findFileUrl(String originalFilename) {
-        return amazonS3.getUrl(bucket, originalFilename).toString();
+    public String findFileUrl(String filename) {
+        return amazonS3.getUrl(bucket, filename).toString();
     }
 
-    public void deleteFile(String originalFilename)  {
-        amazonS3.deleteObject(bucket, originalFilename);
+    public void deleteFile(String filename)  {
+        amazonS3.deleteObject(bucket, filename);
     }
 }

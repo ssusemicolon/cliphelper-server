@@ -28,6 +28,9 @@ public class Article {
     @Column(name = "file_url")
     private String fileUrl;
 
+    @Column(name = "uuid")
+    private String uuid;
+
     @Column(name = "thumbnail")
     private String thumbnail;
 
@@ -62,6 +65,7 @@ public class Article {
         this.id = null;
         this.url = url;
         this.fileUrl = null;
+        this.uuid = null;
         this.thumbnail = thumbnail;
         this.title = title;
         this.description = description;
@@ -70,14 +74,16 @@ public class Article {
         this.recentAccessTime = recentAccessTime;
     }
 
+
     public void setUser(User user) {
         if (user != null) {
             this.user = user;
         }
     }
 
-    public void setFileUrl(String fileUrl) {
+    public void setFileInfo(String fileUrl, String uuid) {
         this.fileUrl = fileUrl;
+        this.uuid =uuid;
     }
 
     public void changeUrl(String url) {
@@ -115,6 +121,9 @@ public class Article {
                 .stream()
                 .map(articleTag -> articleTag.getTag().getName())
                 .collect(Collectors.toList());
+    }
 
+    public void updateRecentAccessTime() {
+        this.recentAccessTime = LocalDateTime.now();
     }
 }

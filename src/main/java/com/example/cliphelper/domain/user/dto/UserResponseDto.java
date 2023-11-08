@@ -13,12 +13,14 @@ public class UserResponseDto {
     private final Long userId;
     private final String email;
     private final String username;
+    private final String picture;
 
     public static UserResponseDto of(User user) {
         return UserResponseDto.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .picture(user.getPicture())
                 .build();
     }
 }

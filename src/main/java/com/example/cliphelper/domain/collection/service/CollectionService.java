@@ -1,12 +1,10 @@
 package com.example.cliphelper.domain.collection.service;
 
-import com.example.cliphelper.domain.bookmark.dto.BookmarkResponseDto;
 import com.example.cliphelper.domain.collection.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.collection.entity.ArticleCollection;
-import com.example.cliphelper.domain.bookmark.entity.Bookmark;
 import com.example.cliphelper.domain.collection.entity.Collection;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.collection.repository.ArticleCollectionRepository;
@@ -19,6 +17,8 @@ import com.example.cliphelper.global.error.exception.ArticleNotInCollectionExcep
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,10 +58,7 @@ public class CollectionService {
         List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
         List<Collection> collections = collectionRepository.findAll();
 
-        collections.forEach(collection -> {
-            collectionResponseDtos.add(CollectionResponseDto.of(collection));
-        });
-
+        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
         return collectionResponseDtos;
     }
 
@@ -88,19 +85,17 @@ public class CollectionService {
         return collectionResponseDtos;
     }
 
-    public List<BookmarkResponseDto> readMyBookmarkCollections() {
+    public List<CollectionResponseDto> readMyBookmarkCollections() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
+        List<CollectionResponseDto> collectionResponseDtos =
+                user.getBookmarks()
+                        .stream()
+                        .map(bookmark -> CollectionResponseDto.of(bookmark.getCollection()))
+                        .collect(Collectors.toList());
 
-        List<Bookmark> bookmarks = user.getBookmarks();
-        bookmarks.forEach(bookmark -> {
-            Collection collection = bookmark.getCollection();
-            bookmarkResponseDtos.add(BookmarkResponseDto.of(collection));
-        });
-
-        return bookmarkResponseDtos;
+        return collectionResponseDtos;
     }
 
     public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {

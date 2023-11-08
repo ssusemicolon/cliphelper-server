@@ -1,7 +1,7 @@
 package com.example.cliphelper.domain.bookmark.controller;
 
 import com.example.cliphelper.domain.bookmark.dto.BookmarkRequestDto;
-import com.example.cliphelper.domain.bookmark.dto.BookmarkResponseDto;
+import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
 import com.example.cliphelper.domain.collection.service.CollectionService;
 import com.example.cliphelper.global.result.ResultCode;
 import com.example.cliphelper.global.result.ResultResponse;
@@ -32,8 +32,8 @@ public class BookmarkController {
     // 내가 북마크한 컬렉션 조회
     @GetMapping("/bookmarks")
     public ResultResponse readMyBookmarkCollections() {
-        List<BookmarkResponseDto> bookmarkResponseDtos = collectionService.readMyBookmarkCollections();
-        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, bookmarkResponseDtos);
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyBookmarkCollections();
+        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
     }
 
     @DeleteMapping("/bookmarks/{bookmarkId}")

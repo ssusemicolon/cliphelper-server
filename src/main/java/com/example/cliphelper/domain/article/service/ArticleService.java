@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -51,12 +52,13 @@ public class ArticleService {
 
         // 스크랩 컨텐츠가 파일인 경우
         if (file != null) {
-            String fileUrl = fileService.uploadFile(file);
-            article.setFileUrl(fileUrl);
+            String uuid = UUID.randomUUID().toString();
+            String fileUrl = fileService.uploadFile(file, uuid);
+            article.setFileInfo(fileUrl, uuid);
+            article.changeTitle(file.getOriginalFilename());
         }
 
         articleRepository.save(article);
-
         // Tag 엔티티, ArticleTag 엔티티 save
         tagService.registerTagInArticle(article, articleRequestDto.getTags());
     }
@@ -75,7 +77,6 @@ public class ArticleService {
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
-
         return ArticleResponseDto.of(article);
     }
 
@@ -143,7 +144,7 @@ public class ArticleService {
 
             // 파일 아티클인 경우 파일을 S3에서 삭제
             if (article.getFileUrl() != null) {
-                fileService.deleteFile(article.getTitle());
+                fileService.deleteFile(article.getUuid() + article.getTitle());
             }
             articleRepository.deleteById(articleId);
         } else {
