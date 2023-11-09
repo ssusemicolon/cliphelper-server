@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ArticleController {
     private final ArticleService articleService;
 
-    @PostMapping(value = "/articles", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/articles", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResultResponse registerArticle(@ModelAttribute ArticleRequestDto articleRequestDto) {
         if (articleRequestDto.getTitle().isBlank()) {
             throw new BusinessException(ErrorCode.ARTICLE_TITLE_IS_BLANK);
@@ -27,7 +27,7 @@ public class ArticleController {
         articleService.createArticle(articleRequestDto);
         return ResultResponse.of(ResultCode.ARTICLE_CREATE_SUCCESS);
     }
-    
+
     // 관리자 전용 API
     @GetMapping("/admin/articles")
     public ResultResponse findAllArticles() {
@@ -48,14 +48,22 @@ public class ArticleController {
     }
 
     @PatchMapping("/articles/{articleId}")
-    public ResultResponse modifyArticle(@PathVariable("articleId") Long articleId, @RequestBody ArticleModifyRequestDto articleModifyRequestDto) {
+    public ResultResponse modifyArticle(@PathVariable("articleId") Long articleId,
+            @RequestBody ArticleModifyRequestDto articleModifyRequestDto) {
         articleService.modifyArticle(articleId, articleModifyRequestDto);
         return ResultResponse.of(ResultCode.ARTICLE_MODIFY_SUCCESS);
     }
 
+    @GetMapping("/articles/{articleId}/collections")
+    public ResultResponse getArticleListOfCollection(@PathVariable("articleId") Long articleId) {
+        List<Long> collectionIds = articleService.getArticleListOfCollection(articleId);
+        return ResultResponse.of(ResultCode.COLLECTION_FIND_SUCCESS, collectionIds);
+    }
+
     // 특정 아티클이 속해 있는 컬렉션 편집
     @PatchMapping("/articles/{articleId}/collections")
-    public ResultResponse modifyArticleListOfCollection(@PathVariable("articleId") Long articleId, @RequestBody List<Long> collectionIdList) {
+    public ResultResponse modifyArticleListOfCollection(@PathVariable("articleId") Long articleId,
+            @RequestBody List<Long> collectionIdList) {
         articleService.modifyArticleListOfCollection(articleId, collectionIdList);
         return ResultResponse.of(ResultCode.ARTICLE_MODIFY_SUCCESS);
     }

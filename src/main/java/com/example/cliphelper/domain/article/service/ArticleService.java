@@ -74,8 +74,7 @@ public class ArticleService {
     }
 
     public List<ArticleResponseDto> findMyArticles() {
-        List<Article> articles = articleRepository.
-                findByUserIdOrderByCreatedAtDesc(securityUtils.getCurrentUserId());
+        List<Article> articles = articleRepository.findByUserIdOrderByCreatedAtDesc(securityUtils.getCurrentUserId());
         return ArticleResponseDto.ofList(articles);
     }
 
@@ -94,12 +93,17 @@ public class ArticleService {
                 articleModifyRequestDto.getThumbnail(),
                 articleModifyRequestDto.getTitle(),
                 articleModifyRequestDto.getDescription(),
-                articleModifyRequestDto.getMemo()
-        );
+                articleModifyRequestDto.getMemo());
 
         changeTags(article, articleModifyRequestDto.getTags());
 
         articleRepository.save(article);
+    }
+
+    public List<Long> getArticleListOfCollection(Long articleId) {
+        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
+        return originalArticleCollectionList.stream().map(ol -> ol.getCollection().getId())
+                .collect(Collectors.toList());
     }
 
     public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
@@ -157,7 +161,8 @@ public class ArticleService {
         }
     }
 
-    private void changeArticleInfo(Article article, String url, String thumbnail, String title, String description, String memo) {
+    private void changeArticleInfo(Article article, String url, String thumbnail, String title, String description,
+            String memo) {
         if (article.getFileUrl() != null) {
             throw new FileNotModifiedException(ErrorCode.FILE_CANNOT_MODIFIED);
         }
