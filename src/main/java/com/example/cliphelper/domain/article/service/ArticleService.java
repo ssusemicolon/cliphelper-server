@@ -63,7 +63,9 @@ public class ArticleService {
 
         articleRepository.save(article);
         // Tag 엔티티, ArticleTag 엔티티 save
-        tagService.registerTagInArticle(article, articleRequestDto.getTags());
+        if (articleRequestDto.getTags() != null) {
+            tagService.registerTagInArticle(article, articleRequestDto.getTags());
+        }
     }
 
     public List<ArticleResponseDto> findAllArticles() {
