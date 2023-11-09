@@ -8,14 +8,10 @@ import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.result.ResultCode;
 import com.example.cliphelper.global.result.ResultResponse;
 import com.example.cliphelper.domain.article.service.ArticleService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,9 +27,7 @@ public class ArticleController {
         articleService.createArticle(articleRequestDto);
         return ResultResponse.of(ResultCode.ARTICLE_CREATE_SUCCESS);
     }
-
-    //======================
-
+    
     // 관리자 전용 API
     @GetMapping("/admin/articles")
     public ResultResponse findAllArticles() {

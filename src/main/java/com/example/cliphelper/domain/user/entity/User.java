@@ -1,5 +1,6 @@
 package com.example.cliphelper.domain.user.entity;
 
+import com.example.cliphelper.domain.alarm.entity.AlarmTime;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.bookmark.entity.Bookmark;
 import com.example.cliphelper.domain.collection.entity.Collection;
@@ -41,6 +42,9 @@ public class User {
     @Column(name = "picture")
     private String picture;
 
+    @Column(name = "enable_notifications")
+    private boolean enableNotifications;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Article> articles = new ArrayList<>();
 
@@ -50,16 +54,25 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Collection> collections = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<AlarmTime> alarmTimeList = new ArrayList<>();
+
     @Builder
     public User(String email, String username, String picture) {
         this.email = email;
         this.username = username;
         this.picture = picture;
+        this.enableNotifications = false;
     }
 
-    public void changeInfo(String email, String username) {
+    public void changeInfo(String email, String username, String picture) {
         changeEmail(email);
         changeUsername(username);
+        changePicture(picture);
+    }
+
+    public void changeEnableNotifications(boolean enableNotifications) {
+        this.enableNotifications = enableNotifications;
     }
 
     private void changeEmail(String email) {
@@ -71,6 +84,12 @@ public class User {
     private void changeUsername(String username) {
         if (this.username != null) {
             this.username = username;
+        }
+    }
+
+    private void changePicture(String picture) {
+        if (this.picture != null) {
+            this.picture = picture;
         }
     }
 }

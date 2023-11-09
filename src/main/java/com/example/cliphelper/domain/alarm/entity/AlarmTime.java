@@ -1,4 +1,4 @@
-package com.example.cliphelper.domain.alarm;
+package com.example.cliphelper.domain.alarm.entity;
 
 import com.example.cliphelper.domain.collection.entity.Collection;
 import com.example.cliphelper.domain.user.entity.User;

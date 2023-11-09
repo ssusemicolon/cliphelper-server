@@ -20,6 +20,7 @@ public enum ResultCode {
     USER_LOGIN_SUCCESS(200, "SU002", "로그인이 성공적으로 완료되었습니다."),
     USER_FIND_SUCCESS(200, "SU003", "회원을 성공적으로 조회하였습니다."),
     ALL_USERS_FIND_SUCCESS(200, "SU004", "모든 회원들을 성공적으로 조회하였습니다."),
+    USER_PROFILE_FIND_SUCCESS(200, "SU000", "회원의 프로필을 성공적으로 조회하였습니다."),
     USER_MODIFY_SUCCESS(200, "SU005", "회원의 정보를 성공적으로 수정하였습니다."),
     USER_DELETE_SUCCESS(200, "SU010", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
 
@@ -54,6 +55,10 @@ public enum ResultCode {
     FILE_DELETE_SUCCESS(200, "SF005", "해당 파일을 성공적으로 삭제하였습니다."),
 
     // 푸시 알림 관련
+    ALLOW_NOTIFICATIONS_SUCCESS(200, "SAL000", "알람 허용이 성공적으로 완료되었습니다."),
+    ALARM_TIME_ADD_SUCCESS(200, "SAL000", "알림을 받을 희망 시간대를 성공적으로 추가하였습니다."),
+    ALARM_TIME_DELETE_SUCCESS(200, "SAL000", "입력한 알람 희망 시간대를 성공적으로 삭제하였습니다."),
+    ALARM_TIME_LIST_FIND_SUCCESS(200, "SAL000", "해당 회원의 알람 희망 시간대 목록을 성공적으로 조회하였습니다."),
     ALARM_SEND_SUCCESS(200, "SAL001", "푸시 알림을 성공적으로 전송하였습니다."),
 
     ;

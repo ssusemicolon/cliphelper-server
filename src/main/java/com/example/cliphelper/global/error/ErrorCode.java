@@ -45,6 +45,11 @@ public enum ErrorCode {
     CANNOT_BOOKMARK_MY_COLLECTION(400, "EB003", "자신의 컬렉션을 북마크할 수 없습니다."),
 
 
+    // 알람
+    ALARM_TIME_NOT_FOUND(404, "EA000", "해당 알람 시간이 존재하지 않습니다."),
+    ALARM_TIME_ALREADY_EXISTS(400, "EAL001", "해당 알람 시간이 이미 존재합니다."),
+
+
     ;
 
     private final int status;

@@ -1,6 +1,7 @@
 package com.example.cliphelper.domain.collection.entity;
 
 import com.example.cliphelper.domain.article.entity.Article;
+import com.example.cliphelper.domain.bookmark.entity.Bookmark;
 import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,9 @@ public class Collection {
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
     public Collection(String title, String description, boolean isPublic) {
         this.id = null;

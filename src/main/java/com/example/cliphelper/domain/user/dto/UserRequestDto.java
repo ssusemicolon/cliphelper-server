@@ -13,17 +13,16 @@ public class UserRequestDto {
     @Email(message = "이메일을 필수로 입력해야 합니다.")
     private String email;
 
-    @NotBlank(message = "비밀번호를 필수로 입력해야 합니다.")
-    private String password;
-
     @NotBlank(message = "닉네임을 필수로 입력해야 합니다.")
     private String username;
+
+    private String picture;
 
     public User toEntity() {
         return new User(
                 this.email,
-                this.password,
-                this.username
+                this.username,
+                this.picture
         );
     }
 }
