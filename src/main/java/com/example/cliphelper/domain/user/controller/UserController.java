@@ -2,6 +2,7 @@ package com.example.cliphelper.domain.user.controller;
 
 import javax.validation.Valid;
 
+import com.example.cliphelper.domain.alarm.dto.AlarmTimeRequestDto;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -72,10 +73,17 @@ public class UserController {
         return ResultResponse.of(ResultCode.ALLOW_NOTIFICATIONS_SUCCESS);
     }
 
-    @PatchMapping("/users/alarms")
+    @PostMapping("/users/alarms")
     public ResultResponse addAlarmTime(@RequestParam("alarmTime") String alarmTimeStr) {
         userService.addAlarmTime(alarmTimeStr);
         return ResultResponse.of(ResultCode.ALARM_TIME_ADD_SUCCESS);
+    }
+
+    @PatchMapping("/users/alarms/{alarmTimeId}")
+    public ResultResponse modifyAlarmTime(@PathVariable("alarmTimeId") Long alarmTimeId,
+                                          @RequestBody AlarmTimeRequestDto alarmTimeRequestDto) {
+        userService.modifyAlarmTime(alarmTimeId, alarmTimeRequestDto.getAlarmTime());
+        return ResultResponse.of(ResultCode.ALARM_TIME_MODIFY_SUCCESS);
     }
 
     @DeleteMapping("/users/alarms/{alarmTimeId}")

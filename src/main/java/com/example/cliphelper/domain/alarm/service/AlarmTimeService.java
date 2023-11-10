@@ -23,6 +23,18 @@ public class AlarmTimeService {
         alarmTimeRepository.save(new AlarmTime(alarmTime, user));
     }
 
+    public AlarmTime getAlarmTime(Long alarmTimeId) {
+        return alarmTimeRepository.findById(alarmTimeId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ALARM_TIME_NOT_FOUND));
+    }
+
+    public void modifyAlarmTime(Long alarmTimeId, int hour, int minute) {
+        AlarmTime alarmTime = getAlarmTime(alarmTimeId);
+        alarmTime.changeTime(hour, minute);
+
+        alarmTimeRepository.flush();
+    }
+
     // 무슨 값을 전달받는가?
      public void deleteAlarmTime(Long alarmTimeId) {
         if (!alarmTimeRepository.existsById(alarmTimeId)) {

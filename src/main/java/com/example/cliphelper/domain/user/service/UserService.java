@@ -1,6 +1,7 @@
 package com.example.cliphelper.domain.user.service;
 
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
+import com.example.cliphelper.domain.alarm.entity.AlarmTime;
 import com.example.cliphelper.domain.alarm.service.AlarmTimeService;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
@@ -121,6 +122,13 @@ public class UserService {
 
         LocalTime alarmTime = LocalTime.of(hour, minute);
         alarmTimeService.addAlarmTime(user, alarmTime);
+    }
+
+    public void modifyAlarmTime(Long alarmTimeId, String alarmTimeStr) {
+        int hour = Integer.parseInt(alarmTimeStr.split(":")[0]);
+        int minute = Integer.parseInt(alarmTimeStr.split(":")[1]);
+
+        alarmTimeService.modifyAlarmTime(alarmTimeId, hour, minute);
     }
 
     public void deleteAlarmTime(Long alarmTimeId) {

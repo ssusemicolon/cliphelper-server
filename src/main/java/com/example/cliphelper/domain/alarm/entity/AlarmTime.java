@@ -36,4 +36,11 @@ public class AlarmTime {
         this.time = time;
         this.user =user;
     }
+
+    public void changeTime(int hour, int minute) {
+        this.time = this.time
+                .withHour(hour)
+                .withMinute(minute);
+    }
+
 }
