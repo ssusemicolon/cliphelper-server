@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
+import com.example.cliphelper.domain.user.service.redis.RefreshTokenService;
 import com.example.cliphelper.global.config.security.dto.JwtDto;
 import com.example.cliphelper.global.config.security.dto.UserDto;
 import com.example.cliphelper.global.config.security.token.JwtAuthenticationToken;
@@ -31,14 +32,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication)
             throws IOException, ServletException {
+
+        final JwtDto dto = handleOAuthLoginSuccess(authentication);
+        HandlerUtility.writeResponse(request, response, dto);
+    }
+
+    private JwtDto handleOAuthLoginSuccess(Authentication authentication) {
         OAuthLoginToken oAuth2User = (OAuthLoginToken) authentication;
         UserDto userDto = UserDto.from(oAuth2User);
         Long userId = getOrSaveUser(userDto);
@@ -48,19 +56,10 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
         JwtDto token = jwtUtil.createJwt(new JwtAuthenticationToken(userId, "",
                 List.of("ROLE_USER").stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())));
 
-        writeResponse(request, response, token);
-    }
+        log.info("save refresh token: {}", token.getRefreshToken());
+        refreshTokenService.addRefreshToken(Long.valueOf(userId), token.getRefreshToken());
 
-    public static void writeResponse(HttpServletRequest request, HttpServletResponse response, Object data)
-            throws IOException, ServletException {
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        try (OutputStream os = response.getOutputStream()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(os, data);
-            os.flush();
-        }
+        return token;
     }
 
     private Optional<User> getUserByEmail(String email) {
