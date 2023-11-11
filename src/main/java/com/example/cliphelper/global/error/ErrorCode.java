@@ -26,6 +26,7 @@ public enum ErrorCode {
     AUTHENTICATION_FAILED(401, "EU003", "로그인에 실패하였습니다."),
     JWT_AUTHENTICATION_FAILED(401, "EU005", "JWT 인증에 실패하였습니다."),
     JWT_EXPIRED(401, "EU006", "만료된 토큰입니다."),
+    LOGOUT_BY_ANOTHER(401, "EU006", "다른 환경에 의해 로그아웃되었습니다."),
 
     // 아티클
     ARTICLE_NOT_FOUND(404, "EA001", "해당 아티클이 존재하지 않습니다."),
@@ -44,11 +45,9 @@ public enum ErrorCode {
     BOOKMARK_CANNOT_FOUND(404, "EB001", "해당 북마크가 존재하지 않습니다."),
     CANNOT_BOOKMARK_MY_COLLECTION(400, "EB003", "자신의 컬렉션을 북마크할 수 없습니다."),
 
-
     // 알람
     ALARM_TIME_NOT_FOUND(404, "EA000", "해당 알람 시간이 존재하지 않습니다."),
     ALARM_TIME_ALREADY_EXISTS(400, "EAL001", "해당 알람 시간이 이미 존재합니다."),
-
 
     ;
 

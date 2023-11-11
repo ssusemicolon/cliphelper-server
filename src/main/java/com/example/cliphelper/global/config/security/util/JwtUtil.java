@@ -73,6 +73,17 @@ public class JwtUtil implements InitializingBean {
         }
     }
 
+    public Claims parseClaimsIgnoreExpiration(String token) {
+        try {
+            JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(JWT_KEY).build();
+            return jwtParser.parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException eje) {
+            return eje.getClaims();
+        } catch (Exception e) {
+            throw new JwtInvalidException();
+        }
+    }
+
     public String extractJwt(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
         return this.extractJwt(authorizationHeader);
@@ -90,7 +101,15 @@ public class JwtUtil implements InitializingBean {
 
     public Authentication getAuthentication(String token) {
         final Claims claims = parseClaims(token);
+        return getAuthentication(token, claims);
+    }
 
+    public Authentication getAuthenticationIgnoreExpiration(String token) {
+        final Claims claims = parseClaimsIgnoreExpiration(token);
+        return getAuthentication(token, claims);
+    }
+
+    private Authentication getAuthentication(String token, Claims claims) {
         final List<SimpleGrantedAuthority> authorities = Arrays.stream(
                 claims.get(CLAIM_AUTHORITIES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)

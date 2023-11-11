@@ -40,6 +40,17 @@ public class HandlerUtility {
         }
     }
 
+    public static void writeResponse(HttpServletRequest request, HttpServletResponse response, Object data)
+            throws IOException, ServletException {
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        try (OutputStream os = response.getOutputStream()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(os, data);
+            os.flush();
+        }
+    }
+
     public static void writeResponse(HttpServletRequest request, HttpServletResponse response,
             ResultResponse resultResponse) throws IOException, ServletException {
         response.setStatus(resultResponse.getStatus());

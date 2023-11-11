@@ -19,11 +19,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.cliphelper.global.config.security.filter.JwtAuthenticationFilter;
 import com.example.cliphelper.global.config.security.filter.LoginAuthenticationFilter;
-import com.example.cliphelper.global.config.security.handler.AuthenticationSuccessHandler;
+import com.example.cliphelper.global.config.security.filter.ReissueAuthenticationFilter;
+import com.example.cliphelper.global.config.security.handler.LoginSuccessHandler;
+import com.example.cliphelper.global.config.security.handler.ReissueSuccessHandler;
 import com.example.cliphelper.global.config.security.handler.CustomAccessDeniedHandler;
 import com.example.cliphelper.global.config.security.handler.CustomAuthenticationEntryPoint;
 import com.example.cliphelper.global.config.security.handler.CustomAuthenticationFailureHandler;
 import com.example.cliphelper.global.config.security.provider.LoginAuthenticationProvider;
+import com.example.cliphelper.global.config.security.provider.RefreshAuthenticationProvider;
 import com.example.cliphelper.global.config.security.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -34,16 +37,26 @@ import lombok.RequiredArgsConstructor;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
         private final JwtUtil jwtUtil;
-        private final AuthenticationSuccessHandler authenticationSuccessHandler;
+        private final LoginSuccessHandler loginSuccessHandler;
+        private final ReissueSuccessHandler reissueSuccessHandler;
         private final CustomAuthenticationFailureHandler authenticationFailureHandler;
         private final CustomAuthenticationEntryPoint authenticationEntryPoint;
         private final CustomAccessDeniedHandler accessDeniedHandler;
         private final LoginAuthenticationProvider loginAuthenticationProvider;
+        private final RefreshAuthenticationProvider refreshAuthenticationProvider;
 
         // filters
         public LoginAuthenticationFilter loginAuthenticationFilter() {
                 final LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
-                filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+                filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+                filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+                filter.setAuthenticationManager(authenticationManager());
+                return filter;
+        }
+
+        public ReissueAuthenticationFilter refreshAuthenticationFilter() {
+                final ReissueAuthenticationFilter filter = new ReissueAuthenticationFilter(jwtUtil);
+                filter.setAuthenticationSuccessHandler(reissueSuccessHandler);
                 filter.setAuthenticationFailureHandler(authenticationFailureHandler);
                 filter.setAuthenticationManager(authenticationManager());
                 return filter;
@@ -51,7 +64,7 @@ public class SecurityConfig {
 
         @Bean
         AuthenticationManager authenticationManager() {
-                return new ProviderManager(Arrays.asList(loginAuthenticationProvider));
+                return new ProviderManager(Arrays.asList(loginAuthenticationProvider, refreshAuthenticationProvider));
         }
 
         @Bean
@@ -90,6 +103,8 @@ public class SecurityConfig {
                                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
                                                 UsernamePasswordAuthenticationFilter.class)
                                 .addFilterBefore(loginAuthenticationFilter(),
+                                                JwtAuthenticationFilter.class)
+                                .addFilterBefore(refreshAuthenticationFilter(),
                                                 JwtAuthenticationFilter.class)
                                 .exceptionHandling(handling -> handling
                                                 .authenticationEntryPoint(authenticationEntryPoint)
