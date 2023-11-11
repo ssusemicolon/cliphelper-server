@@ -65,29 +65,17 @@ public class User {
         this.enableNotifications = false;
     }
 
-    public void changeInfo(String email, String username, String picture) {
-        changeEmail(email);
-        changeUsername(username);
-        changePicture(picture);
-    }
-
     public void changeEnableNotifications(boolean enableNotifications) {
         this.enableNotifications = enableNotifications;
     }
 
-    private void changeEmail(String email) {
-        if (this.email != null) {
-            this.email = email;
-        }
-    }
-
-    private void changeUsername(String username) {
+    public void changeUsername(String username) {
         if (this.username != null) {
             this.username = username;
         }
     }
 
-    private void changePicture(String picture) {
+    public void changePicture(String picture) {
         if (this.picture != null) {
             this.picture = picture;
         }

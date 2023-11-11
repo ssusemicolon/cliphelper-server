@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeRequestDto;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
+import com.example.cliphelper.domain.user.dto.UserModifyPictureRequestDto;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
+import com.example.cliphelper.domain.user.dto.UserModifyUsernameRequestDto;
 import com.example.cliphelper.domain.user.dto.UserRequestDto;
 import com.example.cliphelper.domain.user.dto.UserProfileResponseDto;
 import com.example.cliphelper.domain.user.service.UserService;
@@ -61,10 +62,16 @@ public class UserController {
         return ResultResponse.of(ResultCode.ALARM_TIME_LIST_FIND_SUCCESS, alarmTimeResponseDtos);
     }
 
-    @PatchMapping("/users")
-    public ResultResponse modifyUser(@Valid @RequestBody UserModifyRequestDto userModifyRequestDto) {
-        userService.modifyUser(userModifyRequestDto);
-        return ResultResponse.of(ResultCode.USER_MODIFY_SUCCESS);
+    @PatchMapping("/users/username")
+    public ResultResponse modifyUsername(@Valid @RequestBody UserModifyUsernameRequestDto userModifyRequestDto) {
+        userService.modifyUsername(userModifyRequestDto);
+        return ResultResponse.of(ResultCode.USER_MODIFY_USERNAME_SUCCESS);
+    }
+
+    @PatchMapping("/users/picture")
+    public ResultResponse modifyPicture(@Valid @RequestBody UserModifyPictureRequestDto userModifyPictureRequestDto) {
+        userService.modifyPicture(userModifyPictureRequestDto);
+        return ResultResponse.of(ResultCode.USER_MODIFY_PICTURE_SUCCESS);
     }
 
     @PatchMapping("/users/alarms/setting")

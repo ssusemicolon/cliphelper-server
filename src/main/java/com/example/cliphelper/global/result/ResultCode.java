@@ -21,7 +21,8 @@ public enum ResultCode {
     USER_FIND_SUCCESS(200, "SU003", "회원을 성공적으로 조회하였습니다."),
     ALL_USERS_FIND_SUCCESS(200, "SU004", "모든 회원들을 성공적으로 조회하였습니다."),
     USER_PROFILE_FIND_SUCCESS(200, "SU000", "회원의 프로필을 성공적으로 조회하였습니다."),
-    USER_MODIFY_SUCCESS(200, "SU005", "회원의 정보를 성공적으로 수정하였습니다."),
+    USER_MODIFY_USERNAME_SUCCESS(200, "SU005", "회원의 닉네임를 성공적으로 수정하였습니다."),
+    USER_MODIFY_PICTURE_SUCCESS(200, "SU006", "회원의 이미지를 성공적으로 수정하였습니다."),
     USER_DELETE_SUCCESS(200, "SU010", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
 
     // 아티클(200, 스크랩 컨텐츠 관련)

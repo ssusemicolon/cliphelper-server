@@ -1,10 +1,10 @@
 package com.example.cliphelper.domain.user.service;
 
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
-import com.example.cliphelper.domain.alarm.entity.AlarmTime;
 import com.example.cliphelper.domain.alarm.service.AlarmTimeService;
 import com.example.cliphelper.domain.article.entity.Article;
-import com.example.cliphelper.domain.user.dto.UserModifyRequestDto;
+import com.example.cliphelper.domain.user.dto.UserModifyPictureRequestDto;
+import com.example.cliphelper.domain.user.dto.UserModifyUsernameRequestDto;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.dto.UserRequestDto;
 import com.example.cliphelper.domain.user.dto.UserProfileResponseDto;
@@ -79,16 +79,20 @@ public class UserService {
         return alarmTimeResponseDtos;
     }
 
-    public void modifyUser(UserModifyRequestDto userModifyRequestDto) {
+    public void modifyUsername(UserModifyUsernameRequestDto userModifyUsernameRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        user.changeInfo(
-                userModifyRequestDto.getEmail(),
-                userModifyRequestDto.getUsername(),
-                userModifyRequestDto.getPicture());
+        user.changeUsername(userModifyUsernameRequestDto.getUsername());
+        userRepository.flush();
+    }
 
-        userRepository.save(user);
+    public void modifyPicture(UserModifyPictureRequestDto userModifyPictureRequestDto) {
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        user.changePicture(userModifyPictureRequestDto.getPicture());
+        userRepository.flush();
     }
 
     public void deleteUser() {
