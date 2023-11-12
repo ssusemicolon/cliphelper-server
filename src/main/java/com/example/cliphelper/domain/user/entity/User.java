@@ -70,14 +70,10 @@ public class User {
     }
 
     public void changeUsername(String username) {
-        if (this.username != null) {
-            this.username = username;
-        }
+        this.username = username;
     }
 
     public void changePicture(String picture) {
-        if (this.picture != null) {
-            this.picture = picture;
-        }
+        this.picture = picture;
     }
 }

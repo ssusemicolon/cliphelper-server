@@ -23,6 +23,7 @@ public enum ErrorCode {
     // 회원 및 JWT
     USER_NOT_FOUND(404, "EU001", "해당 회원이 존재하지 않습니다."),
     PASSWORD_NOT_MATCH(401, "EU002", "비밀번호가 일치하지 않습니다."),
+    PICTURE_NOT_EXISTS(400, "EU000", "변경할 회원의 이미지가 존재하지 않습니다."),
     AUTHENTICATION_FAILED(401, "EU003", "로그인에 실패하였습니다."),
     JWT_AUTHENTICATION_FAILED(401, "EU005", "JWT 인증에 실패하였습니다."),
     JWT_EXPIRED(401, "EU006", "만료된 토큰입니다."),

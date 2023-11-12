@@ -28,7 +28,7 @@ public class FileService {
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
 
-        final int UUID_LENGTH = 36;
+        // final int UUID_LENGTH = 36;
         String filename = uuid + originalFilename;
         try {
             amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), metadata);

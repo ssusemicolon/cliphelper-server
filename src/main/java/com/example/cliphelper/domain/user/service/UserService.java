@@ -11,16 +11,19 @@ import com.example.cliphelper.domain.user.dto.UserProfileResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
+import com.example.cliphelper.global.error.BusinessException;
 import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import com.example.cliphelper.global.service.FileService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -88,10 +91,17 @@ public class UserService {
     }
 
     public void modifyPicture(UserModifyPictureRequestDto userModifyPictureRequestDto) {
+        MultipartFile picture = userModifyPictureRequestDto.getPicture();
+        if (picture == null) {
+            // valid 관련으로 수정해야 함
+            throw new BusinessException(ErrorCode.PICTURE_NOT_EXISTS);
+        }
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        user.changePicture(userModifyPictureRequestDto.getPicture());
+        String uuid = UUID.randomUUID().toString();
+        String fileUrl = fileService.uploadFile(picture, uuid);
+        user.changePicture(fileUrl);
         userRepository.flush();
     }
 

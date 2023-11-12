@@ -2,12 +2,13 @@ package com.example.cliphelper.domain.user.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotNull;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserModifyPictureRequestDto {
-    @NotNull
-    private String picture;
+    private MultipartFile picture;
 }
