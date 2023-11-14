@@ -1,4 +1,4 @@
-package com.example.cliphelper.domain.alarm.entity;
+package com.example.cliphelper.domain.user.entity;
 
 import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
@@ -23,16 +23,16 @@ public class NotificationToken {
     @Column(name = "notification_token_id")
     private Long id;
 
-    @Column(name = "device_id")
-    private String deviceId;
+    @Column(name = "device_token")
+    private String deviceToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public NotificationToken(String deviceId, User user) {
+    public NotificationToken(String deviceToken, User user) {
         this.id = null;
-        this.deviceId = deviceId;
+        this.deviceToken = deviceToken;
         this.user =user;
     }
 }

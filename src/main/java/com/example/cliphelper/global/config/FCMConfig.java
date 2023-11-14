@@ -15,9 +15,9 @@ import java.io.IOException;
 public class FCMConfig {
     @Bean
     FirebaseMessaging firebaseMessaging() throws IOException {
-        ClassPathResource resource = new ClassPathResource("firebase/cliphelper-firebase-adminsdk.json");
+        ClassPathResource firebaseResource = new ClassPathResource("firebase/cliphelper-firebase-adminsdk.json");
         FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
+                .setCredentials(GoogleCredentials.fromStream(firebaseResource.getInputStream()))
                 .build();
 
         FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);

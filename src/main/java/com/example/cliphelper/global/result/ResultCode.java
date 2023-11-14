@@ -58,12 +58,13 @@ public enum ResultCode {
     FILE_DELETE_SUCCESS(200, "SF005", "해당 파일을 성공적으로 삭제하였습니다."),
 
     // 푸시 알림 관련
+    NOTIFICATION_TOKEN_REGISTER_SUCCESS(200, "SAL001", "회원의 현재 디바이스 토큰을 성공적으로 등록하였습니다."),
     ALLOW_NOTIFICATIONS_SUCCESS(200, "SAL000", "알람 허용이 성공적으로 완료되었습니다."),
     ALARM_TIME_ADD_SUCCESS(200, "SAL000", "알림을 받을 희망 시간대를 성공적으로 추가하였습니다."),
     ALARM_TIME_MODIFY_SUCCESS(200, "SAL000", "알림을 받을 희망 시간대를 성공적으로 변경하였습니다."),
     ALARM_TIME_DELETE_SUCCESS(200, "SAL000", "입력한 알람 희망 시간대를 성공적으로 삭제하였습니다."),
     ALARM_TIME_LIST_FIND_SUCCESS(200, "SAL000", "해당 회원의 알람 희망 시간대 목록을 성공적으로 조회하였습니다."),
-    ALARM_SEND_SUCCESS(200, "SAL001", "푸시 알림을 성공적으로 전송하였습니다."),
+    ALARM_SEND_SUCCESS(200, "SAL003", "푸시 알림을 성공적으로 전송하였습니다."),
 
     ;
 

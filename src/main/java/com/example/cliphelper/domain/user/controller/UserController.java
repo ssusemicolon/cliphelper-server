@@ -4,6 +4,8 @@ import javax.validation.Valid;
 
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeRequestDto;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
+import com.example.cliphelper.domain.user.dto.DeviceTokenRequestDto;
+import com.example.cliphelper.domain.user.service.NotificationTokenService;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.dto.UserModifyPictureRequestDto;
 import org.springframework.http.MediaType;
@@ -33,12 +35,19 @@ import java.util.List;
 @RestController
 public class UserController {
     private final UserService userService;
+    private final NotificationTokenService notificationTokenService;
     private final SecurityUtils securityUtils;
 
     @PostMapping("/auth/signup")
     public ResultResponse join(@Valid @RequestBody UserRequestDto userRequestDto) {
         Long userId = userService.createUser(userRequestDto);
         return ResultResponse.of(ResultCode.USER_JOIN_SUCCESS);
+    }
+
+    @PostMapping("/users/deviceToken")
+    public ResultResponse registerDevice(@Valid @RequestBody DeviceTokenRequestDto deviceTokenRequestDto) {
+        notificationTokenService.registerNotificationToken(deviceTokenRequestDto);
+        return ResultResponse.of(ResultCode.NOTIFICATION_TOKEN_REGISTER_SUCCESS);
     }
 
     @GetMapping("/users")

@@ -81,8 +81,19 @@ public class ArticleService {
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        article.updateRecentAccessTime();
+        articleRepository.flush();
         return ArticleResponseDto.of(article);
     }
+
+    public ArticleResponseDto findOldestUnseenArticle(Long userId) {
+        Article article = articleRepository.findTopByUserIdOrderByRecentAccessTimeAsc(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        return ArticleResponseDto.of(article);
+    }
+
 
     public void modifyArticle(Long articleId, ArticleModifyRequestDto articleModifyRequestDto) {
         Article article = articleRepository.findById(articleId)

@@ -57,6 +57,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<AlarmTime> alarmTimeList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<NotificationToken> notificationTokens = new ArrayList<>();
+
     @Builder
     public User(String email, String username, String picture) {
         this.email = email;
