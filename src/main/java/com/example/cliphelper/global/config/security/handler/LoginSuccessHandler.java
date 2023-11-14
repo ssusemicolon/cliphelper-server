@@ -1,7 +1,6 @@
 package com.example.cliphelper.global.config.security.handler;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -24,7 +22,8 @@ import com.example.cliphelper.global.config.security.dto.UserDto;
 import com.example.cliphelper.global.config.security.token.JwtAuthenticationToken;
 import com.example.cliphelper.global.config.security.token.OAuthLoginToken;
 import com.example.cliphelper.global.config.security.util.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.cliphelper.global.result.ResultCode;
+import com.example.cliphelper.global.result.ResultResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             throws IOException, ServletException {
 
         final JwtDto dto = handleOAuthLoginSuccess(authentication);
-        HandlerUtility.writeResponse(request, response, dto);
+        HandlerUtility.writeResponse(request, response, ResultResponse.of(ResultCode.USER_LOGIN_SUCCESS, dto));
     }
 
     private JwtDto handleOAuthLoginSuccess(Authentication authentication) {

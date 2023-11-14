@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import com.example.cliphelper.domain.user.service.redis.RefreshTokenService;
 import com.example.cliphelper.global.config.security.dto.JwtDto;
 import com.example.cliphelper.global.config.security.util.JwtUtil;
+import com.example.cliphelper.global.result.ResultCode;
+import com.example.cliphelper.global.result.ResultResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,7 @@ public class ReissueSuccessHandler extends SimpleUrlAuthenticationSuccessHandler
             throws IOException, ServletException {
 
         final JwtDto dto = handleRefreshSuccess(authentication);
-        HandlerUtility.writeResponse(request, response, dto);
+        HandlerUtility.writeResponse(request, response, ResultResponse.of(ResultCode.USER_TOKEN_REFRESH_SUCCESS, dto));
 
     }
 

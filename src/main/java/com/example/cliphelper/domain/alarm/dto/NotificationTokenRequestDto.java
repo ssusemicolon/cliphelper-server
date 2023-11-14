@@ -1,11 +1,11 @@
 package com.example.cliphelper.domain.alarm.dto;
 
+import javax.validation.constraints.NotBlank;
+
 import com.example.cliphelper.domain.alarm.entity.NotificationToken;
-import com.example.cliphelper.domain.user.entity.User;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor

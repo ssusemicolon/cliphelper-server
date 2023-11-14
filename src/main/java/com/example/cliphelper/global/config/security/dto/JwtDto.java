@@ -9,4 +9,5 @@ public class JwtDto {
     private String type;
     private String accessToken;
     private String refreshToken;
+    private Long userId;
 }

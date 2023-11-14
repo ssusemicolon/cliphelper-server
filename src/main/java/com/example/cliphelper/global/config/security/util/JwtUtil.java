@@ -152,6 +152,7 @@ public class JwtUtil implements InitializingBean {
                 .type(BEARER_TYPE)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .userId(Long.valueOf(id))
                 .build();
     }
 

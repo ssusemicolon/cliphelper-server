@@ -25,6 +25,7 @@ public enum ResultCode {
     USER_MODIFY_PICTURE_SUCCESS(200, "SU006", "회원의 이미지를 성공적으로 수정하였습니다."),
     USER_DELETE_SUCCESS(200, "SU010", "입력한 userId의 회원을 성공적으로 삭제하였습니다."),
     USER_SIGN_OUT_SUCCESS(200, "SU011", "로그아웃에 성공했습니다."),
+    USER_TOKEN_REFRESH_SUCCESS(200, "SU012", "토큰 재발급에 성공했습니다."),
 
     // 아티클(200, 스크랩 컨텐츠 관련)
     ARTICLE_CREATE_SUCCESS(200, "SA001", "입력한 아티클을 성공적으로 등록하였습니다."),
