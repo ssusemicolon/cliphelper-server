@@ -11,6 +11,7 @@ import com.example.cliphelper.domain.user.dto.UserModifyProfileRequestDto;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/profile")
-    public ResultResponse modifyUsername(@Valid UserModifyProfileRequestDto userModifyRequestDto) {
+    public ResultResponse modifyUsername(@ModelAttribute @Valid UserModifyProfileRequestDto userModifyRequestDto) {
         userService.modifyProfile(userModifyRequestDto);
         return ResultResponse.of(ResultCode.USER_MODIFY_PROFILE_SUCCESS);
     }

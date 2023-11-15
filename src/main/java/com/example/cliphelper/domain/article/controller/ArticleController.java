@@ -19,7 +19,7 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping(value = "/articles", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResultResponse registerArticle(ArticleRequestDto articleRequestDto) {
+    public ResultResponse registerArticle(@ModelAttribute ArticleRequestDto articleRequestDto) {
         if (articleRequestDto.getTitle().isBlank()) {
             throw new BusinessException(ErrorCode.ARTICLE_TITLE_IS_BLANK);
         }
