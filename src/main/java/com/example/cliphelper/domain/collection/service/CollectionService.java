@@ -1,5 +1,6 @@
 package com.example.cliphelper.domain.collection.service;
 
+import com.example.cliphelper.domain.bookmark.repository.BookmarkRepository;
 import com.example.cliphelper.domain.collection.dto.CollectionModifyRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionRequestDto;
 import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
@@ -29,6 +30,7 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
     private final ArticleCollectionRepository articleCollectionRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final SecurityUtils securityUtils;
 
     // 컬렉션 등록, 수정 시 모든 article을 추가할 수 있는 상태임.
@@ -55,11 +57,23 @@ public class CollectionService {
     }
 
     public List<CollectionResponseDto> readAllCollections() {
-        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
         List<Collection> collections = collectionRepository.findAll();
 
-        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
-        return collectionResponseDtos;
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        List<Collection> userBookmarkCollections = user.getBookmarks()
+                .stream()
+                .map(bookmark -> bookmark.getCollection())
+                .collect(Collectors.toList());
+
+        // 회원의 북마크 여부를 확인하고, DTO에 추가하여 생성한다.
+        return collections
+                .stream()
+                .map(collection -> CollectionResponseDto.of(
+                        collection,
+                        userBookmarkCollections.contains(collection)))
+                .collect(Collectors.toList());
     }
 
     public CollectionResponseDto readCollection(Long collectionId) {
