@@ -102,6 +102,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void deleteUser() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -116,14 +117,15 @@ public class UserService {
         userRepository.deleteById(securityUtils.getCurrentUserId());
     }
 
+    @Transactional
     public void changeNotificationsPreference(boolean status) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         user.changeEnableNotifications(status);
-        userRepository.flush();
     }
 
+    @Transactional
     public void addAlarmTime(String alarmTimeStr) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -135,6 +137,7 @@ public class UserService {
         alarmTimeService.addAlarmTime(user, alarmTime);
     }
 
+    @Transactional
     public void modifyAlarmTime(Long alarmTimeId, String alarmTimeStr) {
         int hour = Integer.parseInt(alarmTimeStr.split(":")[0]);
         int minute = Integer.parseInt(alarmTimeStr.split(":")[1]);
@@ -142,6 +145,7 @@ public class UserService {
         alarmTimeService.modifyAlarmTime(alarmTimeId, hour, minute);
     }
 
+    @Transactional
     public void deleteAlarmTime(Long alarmTimeId) {
         alarmTimeService.deleteAlarmTime(alarmTimeId);
     }
