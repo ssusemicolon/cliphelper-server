@@ -3,21 +3,22 @@ package com.example.cliphelper.domain.user.service;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
 import com.example.cliphelper.domain.alarm.service.AlarmTimeService;
 import com.example.cliphelper.domain.article.entity.Article;
-import com.example.cliphelper.domain.user.dto.UserModifyPictureRequestDto;
-import com.example.cliphelper.domain.user.dto.UserModifyUsernameRequestDto;
+import com.example.cliphelper.domain.user.dto.UserModifyProfileRequestDto;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.dto.UserRequestDto;
 import com.example.cliphelper.domain.user.dto.UserProfileResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.repository.UserRepository;
 import com.example.cliphelper.global.config.security.util.SecurityUtils;
-import com.example.cliphelper.global.error.BusinessException;
 import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import com.example.cliphelper.global.service.FileService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
@@ -26,8 +27,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final FileService fileService;
     private final AlarmTimeService alarmTimeService;
@@ -82,27 +85,21 @@ public class UserService {
         return alarmTimeResponseDtos;
     }
 
-    public void modifyUsername(UserModifyUsernameRequestDto userModifyUsernameRequestDto) {
+    @Transactional
+    public void modifyProfile(UserModifyProfileRequestDto userModifyProfileRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        user.changeUsername(userModifyUsernameRequestDto.getUsername());
-        userRepository.flush();
-    }
+        final String newUsername = userModifyProfileRequestDto.getUsername();
+        user.changeUsername(newUsername);
 
-    public void modifyPicture(UserModifyPictureRequestDto userModifyPictureRequestDto) {
-        MultipartFile picture = userModifyPictureRequestDto.getPicture();
-        if (picture == null) {
-            // valid 관련으로 수정해야 함
-            throw new BusinessException(ErrorCode.PICTURE_NOT_EXISTS);
+        final MultipartFile newUserPicture = userModifyProfileRequestDto.getPicture();
+        if (newUserPicture != null) {
+            log.info("upload file: {}", newUserPicture.getName());
+            final String uuid = UUID.randomUUID().toString();
+            final String fileUrl = fileService.uploadFile(newUserPicture, uuid);
+            user.changePicture(fileUrl);
         }
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        String uuid = UUID.randomUUID().toString();
-        String fileUrl = fileService.uploadFile(picture, uuid);
-        user.changePicture(fileUrl);
-        userRepository.flush();
     }
 
     public void deleteUser() {

@@ -1,16 +1,15 @@
 package com.example.cliphelper.domain.article.dto;
 
-import com.example.cliphelper.domain.article.entity.Article;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
-@Setter
-@NoArgsConstructor
+import com.example.cliphelper.domain.article.entity.Article;
+
+import lombok.Data;
+
+@Data
 public class ArticleRequestDto {
     private String url;
 
@@ -35,7 +34,6 @@ public class ArticleRequestDto {
                 this.description,
                 this.memo,
                 now,
-                now
-        );
+                now);
     }
 }
