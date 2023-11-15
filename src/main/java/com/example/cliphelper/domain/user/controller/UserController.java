@@ -9,6 +9,8 @@ import com.example.cliphelper.domain.user.service.NotificationTokenService;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.dto.UserModifyProfileRequestDto;
 
+import com.example.cliphelper.global.error.BusinessException;
+import com.example.cliphelper.global.error.ErrorCode;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -74,7 +76,11 @@ public class UserController {
     }
 
     @PatchMapping("/users/profile")
-    public ResultResponse modifyUsername(@ModelAttribute @Valid UserModifyProfileRequestDto userModifyRequestDto) {
+    public ResultResponse modifyUsername(@ModelAttribute UserModifyProfileRequestDto userModifyRequestDto) {
+        if (userModifyRequestDto.getUsername().isBlank()) {
+            throw new BusinessException(ErrorCode.USERNAME_IS_BLANK);
+        }
+
         userService.modifyProfile(userModifyRequestDto);
         return ResultResponse.of(ResultCode.USER_MODIFY_PROFILE_SUCCESS);
     }
