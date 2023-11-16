@@ -13,12 +13,16 @@ import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.error.exception.BookmarkMyselfException;
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
+
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+@Slf4j
 public class BookmarkService {
     private final UserRepository userRepository;
     private final CollectionRepository collectionRepository;
@@ -41,6 +45,7 @@ public class BookmarkService {
 
     @Transactional
     public void deleteBookmark(Long collectionId) {
+        log.info("delete request: {}", collectionId);
         bookmarkRepository.deleteBookmarkByCollectionIdAndUserId(
                 collectionId,
                 securityUtils.getCurrentUserId());
