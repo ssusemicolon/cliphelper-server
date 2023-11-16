@@ -35,8 +35,10 @@ public class TagService {
 
     @Transactional
     public void registerTagInArticle(Article article, List<String> names) {
-        Map<String, Tag> tagMap = tagRepository.findAll().stream()
-                .collect(Collectors.toMap(Tag::getName, tag -> tag));
+        Map<String, Tag> tagMap = tagRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        tag -> tag.getName(), tag -> tag));
 
         names.forEach(name -> {
             final Tag tag;

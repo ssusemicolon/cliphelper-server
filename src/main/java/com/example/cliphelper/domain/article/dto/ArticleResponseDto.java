@@ -48,6 +48,7 @@ public class ArticleResponseDto {
 
     public static List<ArticleResponseDto> ofList(List<Article> articles) {
         return articles.stream()
-                .map(article -> ArticleResponseDto.of(article)).collect(Collectors.toList());
+                .map(article -> ArticleResponseDto.of(article))
+                .collect(Collectors.toList());
     }
 }

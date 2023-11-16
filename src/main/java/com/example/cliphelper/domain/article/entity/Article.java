@@ -3,18 +3,19 @@ package com.example.cliphelper.domain.article.entity;
 import com.example.cliphelper.domain.collection.entity.ArticleCollection;
 import com.example.cliphelper.domain.tag.entity.ArticleTag;
 import com.example.cliphelper.domain.user.entity.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Article {
     @Id
@@ -60,30 +61,21 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<ArticleCollection> articleCollections = new ArrayList<>();
 
-    public Article(String url, String thumbnail, String title, String description,
-                   String memo, LocalDateTime createdAt, LocalDateTime recentAccessTime) {
-        this.id = null;
+    @Builder
+    public Article(Long id, String url, String fileUrl, String uuid, String thumbnail,
+                   String title, String description, String memo,
+                   LocalDateTime createdAt, LocalDateTime recentAccessTime, User user) {
+        this.id = id;
         this.url = url;
-        this.fileUrl = null;
-        this.uuid = null;
+        this.fileUrl = fileUrl;
+        this.uuid = uuid;
         this.thumbnail = thumbnail;
         this.title = title;
         this.description = description;
         this.memo = memo;
         this.createdAt = createdAt;
         this.recentAccessTime = recentAccessTime;
-    }
-
-
-    public void setUser(User user) {
-        if (user != null) {
-            this.user = user;
-        }
-    }
-
-    public void setFileInfo(String fileUrl, String uuid) {
-        this.fileUrl = fileUrl;
-        this.uuid =uuid;
+        this.user = user;
     }
 
     public void changeUrl(String url) {

@@ -48,20 +48,19 @@ public class ArticleService {
 
     @Transactional
     public void createArticle(ArticleRequestDto articleRequestDto) {
-        Article article = articleRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
-        article.setUser(user);
 
-        System.out.println("======articleRequestDto.getTitle():" + articleRequestDto.getTitle());
-
-        // 스크랩 컨텐츠가 파일인 경우
+        final Article article;
         MultipartFile file = articleRequestDto.getFile();
-        if (file != null) {
+        if (file != null) { // 파일 아티클인 경우
             String uuid = UUID.randomUUID().toString();
             String fileUrl = fileService.uploadFile(file, uuid);
-            article.setFileInfo(fileUrl, uuid);
+
+            article = articleRequestDto.toEntity(fileUrl, uuid, user);
             article.changeTitle(file.getOriginalFilename());
+        } else { // 일반 아티클인 경우
+            article = articleRequestDto.toEntity(user);
         }
 
         articleRepository.save(article);
@@ -103,6 +102,10 @@ public class ArticleService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
 
+        if (article.getFileUrl() != null) {
+            throw new FileNotModifiedException(ErrorCode.FILE_CANNOT_MODIFIED);
+        }
+
         changeArticleInfo(article,
                 articleModifyRequestDto.getUrl(),
                 articleModifyRequestDto.getThumbnail(),
@@ -111,8 +114,7 @@ public class ArticleService {
                 articleModifyRequestDto.getMemo());
 
         changeTags(article, articleModifyRequestDto.getTags());
-
-        articleRepository.save(article);
+        articleRepository.flush();
     }
 
     public List<Long> getArticleListOfCollection(Long articleId) {
@@ -178,12 +180,8 @@ public class ArticleService {
         }
     }
 
-    private void changeArticleInfo(Article article, String url, String thumbnail, String title, String description,
-            String memo) {
-        if (article.getFileUrl() != null) {
-            throw new FileNotModifiedException(ErrorCode.FILE_CANNOT_MODIFIED);
-        }
-
+    private void changeArticleInfo(Article article, String url, String thumbnail,
+                                   String title, String description, String memo) {
         article.changeUrl(url);
         article.changeThumbnail(thumbnail);
         article.changeTitle(title);
@@ -192,42 +190,49 @@ public class ArticleService {
     }
 
     private void changeTags(Article article, List<String> modifiedTagNames) {
-        List<Tag> originalTags = article.getTags()
+        // ===================Test=================
+        List<ArticleTag> articleTags = article.getArticleTags();
+        articleTags.forEach(articleTag -> System.out.println("hohoho"));
+
+        List<Tag> originalTags = articleTagRepository.findByArticleId(article.getId())
                 .stream()
-                .map(tagName -> tagRepository.findByName(tagName)
-                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.TAG_NOT_FOUND)))
+                .map(articleTag -> articleTag.getTag())
                 .collect(Collectors.toList());
 
-        List<Tag> modifiedTags = new ArrayList<>();
-        modifiedTagNames.forEach(name -> {
-            Tag tag = tagRepository.findByName(name)
-                    .orElse(null);
-            if (tag == null) {
-                tag = new Tag(name);
-                tagRepository.save(tag);
-            }
-            modifiedTags.add(tag);
-        });
+        List<Tag> modifiedTags = modifiedTagNames
+                .stream()
+                .map(tagName -> {
+                    Long tagId = tagService.registerTag(tagName);
+                    return tagRepository.findById(tagId)
+                            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.TAG_NOT_FOUND));
+                })
+                .collect(Collectors.toList());
 
         changeTags(article, originalTags, modifiedTags);
     }
 
     private void changeTags(Article article, List<Tag> originalTags, List<Tag> modifiedTags) {
         // 요청 태그 중, 기존 태그에 없는 태그인 새로운 태그 관련 ArticleTag 객체 추가
-        List<Tag> newTags = modifiedTags.stream()
+        List<Tag> newTags = modifiedTags
+                .stream()
                 .filter(tag -> !originalTags.contains(tag))
                 .collect(Collectors.toList());
         newTags.forEach(tag -> articleTagRepository.save(new ArticleTag(article, tag)));
 
         // 기존 태그 중, 요청 태그에 없는 태그들. 즉 삭제되야 하는 태그들 관련 ArticleTag 객체 삭제
-        List<Tag> deletedTags = originalTags.stream()
+        List<Tag> deletedTags = originalTags
+                .stream()
                 .filter(tag -> !modifiedTags.contains(tag))
                 .collect(Collectors.toList());
         deletedTags.forEach(tag -> {
-            System.out.println("삭제할 태그: " + tag.getName());
+            System.out.println("deletedTag: " + tag.getName());
             final ArticleTag articleTag = articleTagRepository.findByArticleIdAndTagId(article.getId(), tag.getId())
-                    .orElse(null);
+                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLETAG_NOT_FOUND));
 
+            // 현재 파라미터로 Article 객체를 전달받는다.
+            // POJO 에서 동기화 오류 가능성을 방지하기 위해, 해당 객체와 연관된 ArticleTag를 delete하려 하면 delete되지 않는다.
+            // 이를 원활하게 처리하기 위해, 리스트에서 삭제 후, delete 실행
+            // deleteById()를 이용해도 된다.
             article.getArticleTags().remove(articleTag);
             articleTagRepository.delete(articleTag);
         });

@@ -36,6 +36,9 @@ public enum ErrorCode {
     FILE_CANNOT_MODIFIED(400, "EF002", "파일 아티클은 수정할 수 없습니다."),
     ARTICLE_TITLE_IS_BLANK(400, "EA002", "아티클의 제목은 필수로 입력해야 합니다."),
 
+    // 아티클태그
+    ARTICLETAG_NOT_FOUND(404, "EAT001", "해당 아티클태그가 존재하지 않습니다."),
+
     // 태그
     TAG_NOT_FOUND(404, "ET001", "해당 태그가 존재하지 않습니다."),
 
