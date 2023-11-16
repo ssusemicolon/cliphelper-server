@@ -36,7 +36,9 @@ public class BookmarkService {
         bookmarkRepository.save(new Bookmark(user, collection));
     }
 
-    public void deleteBookmark(Long bookmarkId) {
-        bookmarkRepository.deleteById(bookmarkId);
+    public void deleteBookmark(Long collectionId) {
+        bookmarkRepository.deleteBookmarkByCollectionIdAndUserId(
+                collectionId,
+                securityUtils.getCurrentUserId());
     }
 }

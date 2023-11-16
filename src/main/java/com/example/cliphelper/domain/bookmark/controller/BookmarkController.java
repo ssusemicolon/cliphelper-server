@@ -36,9 +36,9 @@ public class BookmarkController {
         return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
     }
 
-    @DeleteMapping("/bookmarks/{bookmarkId}")
-    public ResultResponse deleteBookmark(@PathVariable("bookmarkId") Long bookmarkId) {
-        bookmarkService.deleteBookmark(bookmarkId);
+    @DeleteMapping("/bookmarks/{collectionId}")
+    public ResultResponse deleteBookmark(@PathVariable("collectionId") Long collectionId) {
+        bookmarkService.deleteBookmark(collectionId);
         return ResultResponse.of(ResultCode.BOOKMARK_DELETE_SUCCESS);
     }
 }

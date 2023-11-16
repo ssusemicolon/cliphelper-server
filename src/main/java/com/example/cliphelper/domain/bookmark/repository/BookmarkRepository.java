@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
+
+    void deleteBookmarkByCollectionIdAndUserId(Long collectionId, Long userId);
 }
