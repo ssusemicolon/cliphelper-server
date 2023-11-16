@@ -59,15 +59,8 @@ public class CollectionService {
     public List<CollectionResponseDto> readAllCollections() {
         List<Collection> collections = collectionRepository.findAll();
 
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        List<Collection> userBookmarkCollections = getMyBookmarkCollections();
 
-        List<Collection> userBookmarkCollections = user.getBookmarks()
-                .stream()
-                .map(bookmark -> bookmark.getCollection())
-                .collect(Collectors.toList());
-
-        // 회원의 북마크 여부를 확인하고, DTO에 추가하여 생성한다.
         return collections
                 .stream()
                 .map(collection -> CollectionResponseDto.of(
@@ -80,36 +73,43 @@ public class CollectionService {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
 
-        return CollectionResponseDto.of(collection);
+        List<Collection> userBookmarkCollections = getMyBookmarkCollections();
+
+        return CollectionResponseDto.of(collection, userBookmarkCollections.contains(collection));
     }
 
     public List<CollectionResponseDto> readMyCollections() {
-        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
         List<Collection> collections = collectionRepository.findByUserId(securityUtils.getCurrentUserId());
 
-        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
-        return collectionResponseDtos;
+        return collections
+                .stream()
+                .map(collection -> CollectionResponseDto.of(collection))
+                .collect(Collectors.toList());
     }
 
     public List<CollectionResponseDto> readOtherCollections() {
         List<Collection> collections = collectionRepository.findByUserIdNotAndIsPublicIsTrue(securityUtils.getCurrentUserId());
-        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
 
-        collections.forEach(collection -> collectionResponseDtos.add(CollectionResponseDto.of(collection)));
-        return collectionResponseDtos;
+        List<Collection> userBookmarkCollections = getMyBookmarkCollections();
+
+        return collections
+                .stream()
+                .map(collection -> CollectionResponseDto.of(
+                        collection,
+                        userBookmarkCollections.contains(collection)))
+                .collect(Collectors.toList());
     }
 
     public List<CollectionResponseDto> readMyBookmarkCollections() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        List<CollectionResponseDto> collectionResponseDtos =
-                user.getBookmarks()
-                        .stream()
-                        .map(bookmark -> CollectionResponseDto.of(bookmark.getCollection()))
-                        .collect(Collectors.toList());
-
-        return collectionResponseDtos;
+        return user.getBookmarks()
+                .stream()
+                .map(bookmark -> CollectionResponseDto.of(
+                        bookmark.getCollection(),
+                        true))
+                .collect(Collectors.toList());
     }
 
     public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {
@@ -142,6 +142,16 @@ public class CollectionService {
         } else {
             throw new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND);
         }
+    }
+
+    private List<Collection> getMyBookmarkCollections() {
+        User user = userRepository.findById(securityUtils.getCurrentUserId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return user.getBookmarks()
+                .stream()
+                .map(bookmark -> bookmark.getCollection())
+                .collect(Collectors.toList());
     }
 
     /*

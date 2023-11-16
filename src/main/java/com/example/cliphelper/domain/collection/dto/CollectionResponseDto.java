@@ -23,15 +23,7 @@ public class CollectionResponseDto {
     private Boolean isBookmarked;
 
     public static CollectionResponseDto of(Collection collection) {
-        return CollectionResponseDto.builder()
-                .collectionId(collection.getId())
-                .title(collection.getTitle())
-                .description(collection.getDescription())
-                .isPublic(collection.isPublic())
-                .articles(ArticleResponseDto.ofList(collection.getArticles()))
-                .articleCount(collection.getArticleCount())
-                .user(UserProfileResponseDto.of(collection.getUser()))
-                .build();
+        return of(collection, false);
     }
 
     public static CollectionResponseDto of (Collection collection, boolean isBookmarked) {
