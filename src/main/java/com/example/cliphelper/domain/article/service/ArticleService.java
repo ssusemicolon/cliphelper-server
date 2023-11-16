@@ -24,6 +24,7 @@ import com.example.cliphelper.global.service.FileService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class ArticleService {
     private final ArticleRepository articleRepository;
@@ -44,6 +46,7 @@ public class ArticleService {
     private final FileService fileService;
     private final SecurityUtils securityUtils;
 
+    @Transactional
     public void createArticle(ArticleRequestDto articleRequestDto) {
         Article article = articleRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
@@ -78,6 +81,7 @@ public class ArticleService {
         return ArticleResponseDto.ofList(articles);
     }
 
+    @Transactional
     public ArticleResponseDto findArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
@@ -94,7 +98,7 @@ public class ArticleService {
         return ArticleResponseDto.of(article);
     }
 
-
+    @Transactional
     public void modifyArticle(Long articleId, ArticleModifyRequestDto articleModifyRequestDto) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
@@ -117,6 +121,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
@@ -158,6 +163,7 @@ public class ArticleService {
         });
     }
 
+    @Transactional
     public void deleteArticle(Long articleId) {
         if (articleRepository.existsById(articleId)) {
             Article article = articleRepository.findById(articleId).orElse(null);

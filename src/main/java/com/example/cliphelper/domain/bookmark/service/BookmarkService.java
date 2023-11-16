@@ -14,8 +14,10 @@ import com.example.cliphelper.global.error.exception.BookmarkMyselfException;
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class BookmarkService {
     private final UserRepository userRepository;
@@ -23,6 +25,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final SecurityUtils securityUtils;
 
+    @Transactional
     public void addBookmark(BookmarkRequestDto bookmarkRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -36,6 +39,7 @@ public class BookmarkService {
         bookmarkRepository.save(new Bookmark(user, collection));
     }
 
+    @Transactional
     public void deleteBookmark(Long collectionId) {
         bookmarkRepository.deleteBookmarkByCollectionIdAndUserId(
                 collectionId,

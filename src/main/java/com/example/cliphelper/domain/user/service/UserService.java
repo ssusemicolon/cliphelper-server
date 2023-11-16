@@ -37,6 +37,7 @@ public class UserService {
     private final SecurityUtils securityUtils;
     private final UserRepository userRepository;
 
+    @Transactional
     public Long createUser(UserRequestDto userRequestDto) {
         User user = userRequestDto.toEntity();
         Long userId = userRepository.save(user)

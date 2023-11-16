@@ -22,8 +22,10 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class CollectionService {
     private final CollectionRepository collectionRepository;
@@ -35,6 +37,7 @@ public class CollectionService {
 
     // 컬렉션 등록, 수정 시 모든 article을 추가할 수 있는 상태임.
     // article을 컬렉션에 넣기 전에, 내 아티클인지 확인하는 로직을 넣어야 한다고 생각함.
+    @Transactional
     public void createCollection(CollectionRequestDto collectionRequestDto) {
         Collection collection = collectionRequestDto.toEntity();
         User user = userRepository.findById(securityUtils.getCurrentUserId())
@@ -112,6 +115,7 @@ public class CollectionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void modifyCollectionInfo(Long collectionId, CollectionModifyRequestDto collectionModifyRequestDto) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
@@ -124,6 +128,7 @@ public class CollectionService {
         collectionRepository.save(collection);
     }
 
+    @Transactional
     public void deleteArticleInCollection(Long collectionId, Long articleId) {
         if (!collectionRepository.existsById(collectionId)) {
             throw new EntityNotFoundException(ErrorCode.COLLECTION_NOT_FOUND);
@@ -136,6 +141,7 @@ public class CollectionService {
         articleCollectionRepository.deleteById(articleCollection.getId());
     }
 
+    @Transactional
     public void deleteCollection(Long collectionId) {
         if (collectionRepository.existsById(collectionId)) {
             collectionRepository.deleteById(collectionId);

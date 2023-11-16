@@ -7,12 +7,15 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+
 public class FCMService {
     private final FirebaseMessaging firebaseMessaging;
 
+    @Transactional
     public void sendArticleRecommendationNotification(NotificationRequestDto requestDto) {
         Message message = Message.builder()
                 .setToken(requestDto.getDeviceToken())

@@ -10,14 +10,17 @@ import com.example.cliphelper.global.error.ErrorCode;
 import com.example.cliphelper.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class NotificationTokenService {
     private final UserRepository userRepository;
     private final NotificationTokenRepository notificationTokenRepository;
     private final SecurityUtils securityUtils;
 
+    @Transactional
     public void registerNotificationToken(DeviceTokenRequestDto deviceTokenRequestDto) {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                         .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
