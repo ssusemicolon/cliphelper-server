@@ -6,7 +6,6 @@ import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.collection.entity.ArticleCollection;
 import com.example.cliphelper.domain.tag.entity.ArticleTag;
-import com.example.cliphelper.domain.collection.entity.Collection;
 import com.example.cliphelper.domain.tag.entity.Tag;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.collection.repository.ArticleCollectionRepository;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -117,69 +115,6 @@ public class ArticleService {
         articleRepository.flush();
     }
 
-    public List<Long> getArticleListOfCollection(Long articleId) {
-        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
-        return originalArticleCollectionList.stream().map(ol -> ol.getCollection().getId())
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
-
-        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
-
-        List<ArticleCollection> modifiedArticleCollectionList = new ArrayList<>();
-        collectionIdList.forEach(collectionId -> {
-            Collection collection = collectionRepository.findById(collectionId)
-                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
-
-            ArticleCollection articleCollection = articleCollectionRepository
-                    .findByArticleIdAndCollectionId(articleId, collectionId)
-                    .orElse(new ArticleCollection(article, collection));
-            modifiedArticleCollectionList.add(articleCollection);
-        });
-
-        changeCollection(originalArticleCollectionList, modifiedArticleCollectionList);
-    }
-
-    private void changeCollection(List<ArticleCollection> originalArticleCollectionList,
-            List<ArticleCollection> modifiedArticleCollectionList) {
-        List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList.stream()
-                .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
-                .collect(Collectors.toList());
-
-        newArticleCollectionList.forEach(articleCollection -> {
-            articleCollectionRepository.save(articleCollection);
-            articleCollection.getCollection().addArticleCount();
-        });
-
-        List<ArticleCollection> deletedArticleCollectionList = originalArticleCollectionList.stream()
-                .filter(articleCollection -> !modifiedArticleCollectionList.contains(articleCollection))
-                .collect(Collectors.toList());
-
-        deletedArticleCollectionList.forEach(articleCollection -> {
-            articleCollectionRepository.deleteById(articleCollection.getId());
-            articleCollection.getCollection().minusArticleCount();
-        });
-    }
-
-    @Transactional
-    public void deleteArticle(Long articleId) {
-        if (articleRepository.existsById(articleId)) {
-            Article article = articleRepository.findById(articleId).orElse(null);
-
-            // 파일 아티클인 경우 파일을 S3에서 삭제
-            if (article.getFileUrl() != null) {
-                fileService.deleteFile(article.getUuid() + article.getTitle());
-            }
-            articleRepository.deleteById(articleId);
-        } else {
-            throw new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND);
-        }
-    }
-
     private void changeArticleInfo(Article article, String url, String thumbnail,
                                    String title, String description, String memo) {
         article.changeUrl(url);
@@ -190,10 +125,6 @@ public class ArticleService {
     }
 
     private void changeTags(Article article, List<String> modifiedTagNames) {
-        // ===================Test=================
-        List<ArticleTag> articleTags = article.getArticleTags();
-        articleTags.forEach(articleTag -> System.out.println("hohoho"));
-
         List<Tag> originalTags = articleTagRepository.findByArticleId(article.getId())
                 .stream()
                 .map(articleTag -> articleTag.getTag())
@@ -225,7 +156,6 @@ public class ArticleService {
                 .filter(tag -> !modifiedTags.contains(tag))
                 .collect(Collectors.toList());
         deletedTags.forEach(tag -> {
-            System.out.println("deletedTag: " + tag.getName());
             final ArticleTag articleTag = articleTagRepository.findByArticleIdAndTagId(article.getId(), tag.getId())
                     .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLETAG_NOT_FOUND));
 
@@ -236,5 +166,68 @@ public class ArticleService {
             article.getArticleTags().remove(articleTag);
             articleTagRepository.delete(articleTag);
         });
+    }
+
+    public List<Long> getArticleListOfCollection(Long articleId) {
+        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
+        return originalArticleCollectionList.stream().map(ol -> ol.getCollection().getId())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void modifyArticleListOfCollection(Long articleId, List<Long> collectionIdList) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        List<ArticleCollection> originalArticleCollectionList = articleCollectionRepository.findByArticleId(articleId);
+
+        List<ArticleCollection> modifiedArticleCollectionList = collectionIdList
+                .stream()
+                .map(collectionId -> collectionRepository.findById(collectionId)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND)))
+                .map(collection -> articleCollectionRepository.findByArticleIdAndCollectionId(
+                                articleId,
+                                collection.getId())
+                        .orElse(new ArticleCollection(article, collection)))
+                .collect(Collectors.toList());
+
+        changeCollection(originalArticleCollectionList, modifiedArticleCollectionList);
+    }
+
+    private void changeCollection(List<ArticleCollection> originalArticleCollectionList,
+            List<ArticleCollection> modifiedArticleCollectionList) {
+
+        List<ArticleCollection> newArticleCollectionList = modifiedArticleCollectionList
+                .stream()
+                .filter(articleCollection -> !originalArticleCollectionList.contains(articleCollection))
+                .collect(Collectors.toList());
+
+        newArticleCollectionList.forEach(articleCollection -> {
+            articleCollection.getCollection().addArticleCount();
+            articleCollectionRepository.save(articleCollection);
+        });
+
+        List<ArticleCollection> deletedArticleCollectionList = originalArticleCollectionList
+                .stream()
+                .filter(articleCollection -> !modifiedArticleCollectionList.contains(articleCollection))
+                .collect(Collectors.toList());
+
+        deletedArticleCollectionList.forEach(articleCollection -> {
+            articleCollection.getCollection().minusArticleCount();
+            articleCollectionRepository.deleteById(articleCollection.getId());
+        });
+    }
+
+    @Transactional
+    public void deleteArticle(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        // 파일 아티클인 경우 S3에서 파일을 삭제
+        if (article.getFileUrl() != null) {
+            fileService.deleteFile(article.getUuid() + article.getTitle());
+        }
+
+        articleRepository.deleteById(articleId);
     }
 }

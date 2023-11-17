@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,6 @@ public class ArticleResponseDto {
                 .userId(article.getUser().getId())
                 .build();
     }
-
 
     public static List<ArticleResponseDto> ofList(List<Article> articles) {
         return articles.stream()

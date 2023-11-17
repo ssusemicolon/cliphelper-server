@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/profile")
-    public ResultResponse modifyUsername(@ModelAttribute UserModifyProfileRequestDto userModifyRequestDto) {
+    public ResultResponse modifyProfile(@ModelAttribute UserModifyProfileRequestDto userModifyRequestDto) {
         if (userModifyRequestDto.getUsername().isBlank()) {
             throw new BusinessException(ErrorCode.USERNAME_IS_BLANK);
         }

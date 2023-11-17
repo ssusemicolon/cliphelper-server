@@ -20,7 +20,6 @@ public class TagService {
     private final TagRepository tagRepository;
     private final ArticleTagRepository articleTagRepository;
 
-    // 태그는 모든 사용자가 공유할 수 있다고 가정한다. (인스타그램의 해시태그처럼)
     @Transactional
     public Long registerTag(String name) {
         Tag tag = tagRepository.findByName(name)

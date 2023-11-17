@@ -19,10 +19,12 @@ public class UserRequestDto {
     private String picture;
 
     public User toEntity() {
-        return new User(
-                this.email,
-                this.username,
-                this.picture
-        );
+        return User.builder()
+                .id(null)
+                .email(email)
+                .username(username)
+                .picture(picture)
+                .enableNotifications(false)
+                .build();
     }
 }

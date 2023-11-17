@@ -4,8 +4,9 @@ import com.example.cliphelper.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Getter
 @RequiredArgsConstructor
 public class UserProfileResponseDto {

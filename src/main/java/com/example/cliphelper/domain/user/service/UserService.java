@@ -40,20 +40,17 @@ public class UserService {
     @Transactional
     public Long createUser(UserRequestDto userRequestDto) {
         User user = userRequestDto.toEntity();
-        Long userId = userRepository.save(user)
-                .getId();
 
-        return userId;
+        return userRepository.save(user).getId();
     }
 
     public List<UserProfileResponseDto> findAllUsers() {
         List<User> users = userRepository.findAll();
-        List<UserProfileResponseDto> userProfileResponseDtos = new ArrayList<>();
-        for (User user : users) {
-            userProfileResponseDtos.add(UserProfileResponseDto.of(user));
-        }
 
-        return userProfileResponseDtos;
+        return users
+                .stream()
+                .map(user -> UserProfileResponseDto.of(user))
+                .collect(Collectors.toList());
     }
 
     public UserProfileResponseDto findUser(Long userId) {
@@ -65,25 +62,19 @@ public class UserService {
 
     public UserDetailedProfileResponseDto getUserProfile() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        int followerCount = user.getCollections().stream()
-                .map(collection -> collection.getBookmarks().size())
-                .mapToInt(Integer::intValue).sum();
-
-        return UserDetailedProfileResponseDto.of(user, followerCount);
+        return UserDetailedProfileResponseDto.of(user);
     }
 
     public List<AlarmTimeResponseDto> getUserAlarmTimeList() {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new RuntimeException("해당 userId를 가진 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        List<AlarmTimeResponseDto> alarmTimeResponseDtos = user.getAlarmTimeList()
+        return user.getAlarmTimeList()
                 .stream()
                 .map(alarmTime -> AlarmTimeResponseDto.of(alarmTime))
                 .collect(Collectors.toList());
-
-        return alarmTimeResponseDtos;
     }
 
     @Transactional
@@ -91,14 +82,14 @@ public class UserService {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        final String newUsername = userModifyProfileRequestDto.getUsername();
-        user.changeUsername(newUsername);
+        user.changeUsername(userModifyProfileRequestDto.getUsername());
 
-        final MultipartFile newUserPicture = userModifyProfileRequestDto.getPicture();
-        if (newUserPicture != null) {
-            log.info("upload file: {}", newUserPicture.getName());
+        final MultipartFile modifiedPicture = userModifyProfileRequestDto.getPicture();
+        if (modifiedPicture != null) {
+            log.info("upload file: {}", modifiedPicture.getName());
             final String uuid = UUID.randomUUID().toString();
-            final String fileUrl = fileService.uploadFile(newUserPicture, uuid);
+            final String fileUrl = fileService.uploadFile(modifiedPicture, uuid);
+
             user.changePicture(fileUrl);
         }
     }
@@ -131,19 +122,28 @@ public class UserService {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        int hour = Integer.parseInt(alarmTimeStr.split(":")[0]);
-        int minute = Integer.parseInt(alarmTimeStr.split(":")[1]);
+        int hour = convertToHour(alarmTimeStr);
+        int minute = convertToMinute(alarmTimeStr);
 
         LocalTime alarmTime = LocalTime.of(hour, minute);
         alarmTimeService.addAlarmTime(user, alarmTime);
     }
 
+    // 수정하려는 AlarmTime의 주인이 맞는지 인가 과정이 필요한가?
     @Transactional
     public void modifyAlarmTime(Long alarmTimeId, String alarmTimeStr) {
-        int hour = Integer.parseInt(alarmTimeStr.split(":")[0]);
-        int minute = Integer.parseInt(alarmTimeStr.split(":")[1]);
+        int hour = convertToHour(alarmTimeStr);
+        int minute = convertToMinute(alarmTimeStr);
 
         alarmTimeService.modifyAlarmTime(alarmTimeId, hour, minute);
+    }
+
+    private int convertToHour(String alarmTimeStr) {
+        return Integer.parseInt(alarmTimeStr.split(":")[0]);
+    }
+
+    private int convertToMinute(String alarmTimeStr) {
+        return Integer.parseInt(alarmTimeStr.split(":")[1]);
     }
 
     @Transactional
