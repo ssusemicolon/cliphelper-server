@@ -1,8 +1,6 @@
 package com.example.cliphelper.domain.alarm.dto;
 
 import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
-import com.example.cliphelper.domain.article.entity.Article;
-import com.example.cliphelper.domain.user.entity.User;
 import com.google.firebase.messaging.Notification;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationRequestDto {
+public class PushNotificationRequestDto {
     private static final String NOTIFICATION_MESSAGE = "잠깐! 여유 시간이 생긴 %s님께 위 아티클을 추천해 드려요.";
     private String deviceToken;
     private Long articleId;
@@ -29,12 +27,12 @@ public class NotificationRequestDto {
                 .build();
     }
 
-    public static NotificationRequestDto of(String deviceToken, ArticleResponseDto articleResponseDto, User user) {
-        return NotificationRequestDto.builder()
+    public static PushNotificationRequestDto of(String deviceToken, ArticleResponseDto articleResponseDto, String username) {
+        return PushNotificationRequestDto.builder()
                 .deviceToken(deviceToken)
                 .articleId(articleResponseDto.getArticleId())
                 .title(articleResponseDto.getTitle())
-                .body(String.format(NOTIFICATION_MESSAGE, user.getUsername()))
+                .body(String.format(NOTIFICATION_MESSAGE, username))
                 .image(articleResponseDto.getThumbnail())
                 .build();
     }

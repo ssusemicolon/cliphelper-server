@@ -1,15 +1,17 @@
 package com.example.cliphelper.global.scheduler;
 
-import com.example.cliphelper.domain.alarm.dto.NotificationRequestDto;
-import com.example.cliphelper.domain.alarm.repository.AlarmTimeRepository;
-import com.example.cliphelper.domain.article.entity.Article;
-import com.example.cliphelper.domain.article.repository.ArticleRepository;
+import com.example.cliphelper.domain.alarm.dto.PushNotificationRequestDto;
+import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
 import com.example.cliphelper.domain.article.service.ArticleService;
+import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
+import com.example.cliphelper.domain.user.service.NotificationTokenService;
+import com.example.cliphelper.domain.user.service.UserService;
 import com.example.cliphelper.global.service.FCMService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +21,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class Scheduler {
+    private final UserService userService;
     private final ArticleService articleService;
     private final FCMService fcmService;
-    private final ArticleRepository articleRepository;
-    private final AlarmTimeRepository alarmTimeRepository;
+    private final NotificationTokenService notificationTokenService;
 
     /**
      * 스케줄러 실행 주기: 매일 자정(00시 00분)
@@ -35,14 +37,15 @@ public class Scheduler {
     @Scheduled(cron = "${schedules.cron.article.cleanup}", zone = "Asia/Seoul")
     public void autoCleanupArticleByLRU() {
         System.out.println("==========LRU 아티클 삭제 스케줄러 동작 시작==========");
-        List<Article> articles = articleRepository.findAll();
+        List<ArticleResponseDto> articleResponseDtos = articleService.findAllArticles();
 
-        articles.forEach(article -> {
+        articleResponseDtos.forEach(articleResponseDto -> {
             LocalDate now = LocalDate.now();
-            LocalDate recentAccessTime = article.getRecentAccessTime().toLocalDate();
+            LocalDate recentAccessTime = articleResponseDto.getRecentAccessTime().toLocalDate();
+
             Period elapsedTimeSinceAccess = Period.between(recentAccessTime, now);
             if (elapsedTimeSinceAccess.getDays() >= 15) {
-                articleService.deleteArticle(article.getId());
+                articleService.deleteArticle(articleResponseDto.getArticleId());
             }
         });
     }
@@ -55,34 +58,38 @@ public class Scheduler {
      */
     @Scheduled(cron = "0 0/10 * * * ?", zone = "Asia/Seoul")
     public void sendPushNotification() {
+        System.out.println("==================푸시 알림 스케줄러 동작=======================");
         // 현재 시간을 조회 후, 초와 나노초는 0으로 변경한 시간대를 리턴하는 함수 호출
         LocalTime now = getCurrentHourAndMinuteToLocalTime();
 
         // 현재 시간대를 알람 희망 시간대로 설정한 유저 조회
-        // 단, 회원이 알람을 받지 않겠다고 설정한 경우 알림 전송 대상에서 제외한다
-        // 단, 등록한 아티클이 없는 유저는 필터하여 알림 전송 대상에서 제외한다
-        List<User> users = alarmTimeRepository.findAllByTimeIs(now)
+        // 단, 회원이 알람을 받겠다고 설정한 회원만 알림 전송 대상으로 한다.
+        // 단, 등록한 아티클이 있는 회원만 알림 전송 대상으로 한다.
+        List<User> users = userService.findUsersByAlarmTime(now)
                 .stream()
-                .map(alarmTime -> alarmTime.getUser())
-                .filter(user -> user.isEnableNotifications() && user.getArticles().size() > 0)
+                .filter(user -> user.isEnableNotifications() == true)
+                .filter(user -> articleService.getArticleCountByUserId(user.getId()) > 0)
                 .collect(Collectors.toList());
 
+        // 테스트 코드
+        users.forEach(
+                user -> System.out.printf("알람시간 설정한 회원: %s\n", user.getUsername())
+        );
 
-        // 현재 유저가 여러 개의 디바이스를 가질 수 잇는데, 그 중 0번째 디바이스에게만 알림 보내도록 설정
-        List<NotificationRequestDto> notificationRequestDtos = users
+        List<PushNotificationRequestDto> pushNotificationRequestDtos = users
                 .stream()
-                .filter(user -> user.getNotificationTokens().size() > 0)
-                .map(user -> NotificationRequestDto.of(
-                        user.getNotificationTokens().get(0).getDeviceToken(),
-                        // 해당 유저의 아티클들 중 추천할 아티클을 선택하는 알고리즘
-                        articleService.findOldestUnseenArticle(user.getId()),
-                        user))
+                .map(user -> notificationTokenService.findNotificationTokensByUserId(user.getId()))
+                .flatMap(Collection::stream)
+                .map(notificationTokenResponseDto -> PushNotificationRequestDto.of(
+                        notificationTokenResponseDto.getDeviceToken(),
+                        articleService.findOldestUnseenArticle(notificationTokenResponseDto.getUser().getUserId()),
+                        notificationTokenResponseDto.getUser().getUsername()))
                 .collect(Collectors.toList());
 
 
         // 선택한 알고리즘을 바탕으로, 유저의 디바이스 토큰과 함께 묶어 Message 객체 생성 후 send
-        notificationRequestDtos.forEach(notificationRequestDto ->
-                fcmService.sendArticleRecommendationNotification(notificationRequestDto));
+        pushNotificationRequestDtos.forEach(pushNotificationRequestDto ->
+                fcmService.sendArticleRecommendationNotification(pushNotificationRequestDto));
     }
 
     private LocalTime getCurrentHourAndMinuteToLocalTime() {

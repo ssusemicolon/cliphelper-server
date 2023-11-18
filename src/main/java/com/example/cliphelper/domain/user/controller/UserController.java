@@ -4,7 +4,7 @@ import javax.validation.Valid;
 
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeRequestDto;
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
-import com.example.cliphelper.domain.user.dto.DeviceTokenRequestDto;
+import com.example.cliphelper.domain.user.dto.NotificationTokenRequestDto;
 import com.example.cliphelper.domain.user.service.NotificationTokenService;
 import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.dto.UserModifyProfileRequestDto;
@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @PostMapping("/users/deviceToken")
-    public ResultResponse registerDevice(@Valid @RequestBody DeviceTokenRequestDto deviceTokenRequestDto) {
-        notificationTokenService.registerNotificationToken(deviceTokenRequestDto);
+    public ResultResponse registerDevice(@Valid @RequestBody NotificationTokenRequestDto notificationTokenRequestDto) {
+        notificationTokenService.registerNotificationToken(notificationTokenRequestDto);
         return ResultResponse.of(ResultCode.NOTIFICATION_TOKEN_REGISTER_SUCCESS);
     }
 

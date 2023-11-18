@@ -16,4 +16,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     // 파라미터로 전달받은 userId를 가진 회원의 아티클 중, 가장 접근한지 오래된 아티클을 1개 조회하는 함수
     Optional<Article> findTopByUserIdOrderByRecentAccessTimeAsc(Long userId);
+
+    Long countByUserId(Long userId);
 }

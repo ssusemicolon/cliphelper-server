@@ -62,7 +62,7 @@ public class Article {
     private List<ArticleCollection> articleCollections = new ArrayList<>();
 
     @Builder
-    public Article(Long id, String url, String fileUrl, String uuid, String thumbnail,
+    private Article(Long id, String url, String fileUrl, String uuid, String thumbnail,
                    String title, String description, String memo,
                    LocalDateTime createdAt, LocalDateTime recentAccessTime, User user) {
         this.id = id;

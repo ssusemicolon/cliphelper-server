@@ -132,11 +132,9 @@ public class ArticleService {
 
         List<Tag> modifiedTags = modifiedTagNames
                 .stream()
-                .map(tagName -> {
-                    Long tagId = tagService.registerTag(tagName);
-                    return tagRepository.findById(tagId)
-                            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.TAG_NOT_FOUND));
-                })
+                .map(tagName -> tagService.registerTag(tagName))
+                .map(tagId -> tagRepository.findById(tagId)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.TAG_NOT_FOUND)))
                 .collect(Collectors.toList());
 
         changeTags(article, originalTags, modifiedTags);
@@ -229,5 +227,9 @@ public class ArticleService {
         }
 
         articleRepository.deleteById(articleId);
+    }
+
+    public Long getArticleCountByUserId(Long userId) {
+        return articleRepository.countByUserId(userId);
     }
 }

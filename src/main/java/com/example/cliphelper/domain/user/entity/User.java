@@ -60,7 +60,7 @@ public class User {
     private List<NotificationToken> notificationTokens = new ArrayList<>();
 
     @Builder
-    public User(Long id, String email, String username,
+    private User(Long id, String email, String username,
                 String picture, boolean enableNotifications) {
         this.id = id;
         this.email = email;

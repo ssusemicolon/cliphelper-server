@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor
-public class DeviceTokenRequestDto {
+public class NotificationTokenRequestDto {
     @NotBlank
     private String deviceToken;
 

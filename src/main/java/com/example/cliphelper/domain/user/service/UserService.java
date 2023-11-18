@@ -1,6 +1,7 @@
 package com.example.cliphelper.domain.user.service;
 
 import com.example.cliphelper.domain.alarm.dto.AlarmTimeResponseDto;
+import com.example.cliphelper.domain.alarm.entity.AlarmTime;
 import com.example.cliphelper.domain.alarm.service.AlarmTimeService;
 import com.example.cliphelper.domain.article.entity.Article;
 import com.example.cliphelper.domain.user.dto.UserModifyProfileRequestDto;
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -149,5 +149,10 @@ public class UserService {
     @Transactional
     public void deleteAlarmTime(Long alarmTimeId) {
         alarmTimeService.deleteAlarmTime(alarmTimeId);
+    }
+
+    // 특정 시간대를 알람 희망 시간대로 설정한 유저 조회
+    public List<User> findUsersByAlarmTime(LocalTime time) {
+        return userRepository.findByAlarmTime(time);
     }
 }

@@ -1,7 +1,6 @@
 package com.example.cliphelper.global.service;
 
-import com.example.cliphelper.domain.alarm.dto.NotificationRequestDto;
-import com.example.cliphelper.domain.user.entity.User;
+import com.example.cliphelper.domain.alarm.dto.PushNotificationRequestDto;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -16,7 +15,7 @@ public class FCMService {
     private final FirebaseMessaging firebaseMessaging;
 
     @Transactional
-    public void sendArticleRecommendationNotification(NotificationRequestDto requestDto) {
+    public void sendArticleRecommendationNotification(PushNotificationRequestDto requestDto) {
         Message message = Message.builder()
                 .setToken(requestDto.getDeviceToken())
                 .setNotification(requestDto.toNotification())
