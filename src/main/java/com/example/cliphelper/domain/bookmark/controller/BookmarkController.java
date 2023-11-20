@@ -1,0 +1,44 @@
+package com.example.cliphelper.domain.bookmark.controller;
+
+import com.example.cliphelper.domain.bookmark.dto.BookmarkRequestDto;
+import com.example.cliphelper.domain.collection.dto.CollectionResponseDto;
+import com.example.cliphelper.domain.collection.service.CollectionService;
+import com.example.cliphelper.global.result.ResultCode;
+import com.example.cliphelper.global.result.ResultResponse;
+import com.example.cliphelper.domain.bookmark.service.BookmarkService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+public class BookmarkController {
+    private final BookmarkService bookmarkService;
+    private final CollectionService collectionService;
+
+    @PostMapping("/bookmarks")
+    public ResultResponse addBookmark(@Valid @RequestBody BookmarkRequestDto bookmarkRequestDto) {
+        bookmarkService.addBookmark(bookmarkRequestDto);
+        return ResultResponse.of(ResultCode.BOOKMARK_COLLECTION_SUCCESS);
+    }
+
+    // 내가 북마크한 컬렉션 조회
+    @GetMapping("/bookmarks")
+    public ResultResponse readMyBookmarkCollections() {
+        List<CollectionResponseDto> collectionResponseDtos = collectionService.readMyBookmarkCollections();
+        return ResultResponse.of(ResultCode.MY_BOOKMARKS_FIND_SUCCESS, collectionResponseDtos);
+    }
+
+    @DeleteMapping("/bookmarks/{collectionId}")
+    public ResultResponse deleteBookmark(@PathVariable("collectionId") Long collectionId) {
+        bookmarkService.deleteBookmark(collectionId);
+        return ResultResponse.of(ResultCode.BOOKMARK_DELETE_SUCCESS);
+    }
+}
