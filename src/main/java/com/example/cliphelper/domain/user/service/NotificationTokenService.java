@@ -29,9 +29,16 @@ public class NotificationTokenService {
         User user = userRepository.findById(securityUtils.getCurrentUserId())
                         .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        NotificationToken notificationToken = new NotificationToken(
-                notificationTokenRequestDto.getDeviceToken(),
-                user);
+        String deviceToken = notificationTokenRequestDto.getDeviceToken();
+
+        // 이미 동일한 device_token을 가진 NotificationToken 엔티티가 있는지 확인
+        if (notificationTokenRepository.existsByDeviceToken(deviceToken) == true) {
+            // 있는 경우: 함수 종료
+            return;
+        }
+
+        // 없는 경우: 해당 토큰 저장
+        NotificationToken notificationToken = new NotificationToken(deviceToken, user);
         notificationTokenRepository.save(notificationToken);
     }
 

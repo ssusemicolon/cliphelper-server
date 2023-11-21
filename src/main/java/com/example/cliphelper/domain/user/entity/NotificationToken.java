@@ -1,6 +1,5 @@
 package com.example.cliphelper.domain.user.entity;
 
-import com.example.cliphelper.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,13 +9,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.time.LocalTime;
+import javax.persistence.Table;
 
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(indexes = @Index(name = "notification_token_device_token_index", columnList = "device_token"))
 public class NotificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

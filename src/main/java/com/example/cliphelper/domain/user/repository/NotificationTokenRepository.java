@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface NotificationTokenRepository extends JpaRepository<NotificationToken, Long> {
 
+    boolean existsByDeviceToken(String deviceToken);
+
     List<NotificationToken> findByUserId(Long userId);
 }
