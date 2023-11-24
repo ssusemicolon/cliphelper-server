@@ -3,7 +3,6 @@ package com.example.cliphelper.global.scheduler;
 import com.example.cliphelper.domain.alarm.dto.PushNotificationRequestDto;
 import com.example.cliphelper.domain.article.dto.ArticleResponseDto;
 import com.example.cliphelper.domain.article.service.ArticleService;
-import com.example.cliphelper.domain.user.dto.UserDetailedProfileResponseDto;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.service.NotificationTokenService;
 import com.example.cliphelper.domain.user.service.UserService;
