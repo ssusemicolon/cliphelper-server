@@ -6,7 +6,10 @@ import com.example.cliphelper.domain.article.service.ArticleService;
 import com.example.cliphelper.domain.user.entity.User;
 import com.example.cliphelper.domain.user.service.NotificationTokenService;
 import com.example.cliphelper.domain.user.service.UserService;
+import com.example.cliphelper.global.config.RestDayUtils;
 import com.example.cliphelper.global.service.FCMService;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
@@ -24,6 +27,7 @@ public class Scheduler {
     private final ArticleService articleService;
     private final FCMService fcmService;
     private final NotificationTokenService notificationTokenService;
+    private final RestDayUtils restDayUtils;
 
     /**
      * 스케줄러 실행 주기: 매일 자정(00시 00분)
@@ -58,6 +62,12 @@ public class Scheduler {
     @Scheduled(cron = "0 0/10 * * * ?", zone = "Asia/Seoul")
     public void sendPushNotification() {
         System.out.println("==================푸시 알림 스케줄러 동작=======================");
+        // 오늘 날짜가 공휴일인지 판단하기
+        LocalDate today = LocalDate.now();
+        if (restDayUtils.isTodayRestDay() == true || today.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            System.out.println("=================공휴일(일요일 포함)은 푸시 알림을 전송하지 않습니다.================");
+            return;
+        }
         // 현재 시간을 조회 후, 초와 나노초는 0으로 변경한 시간대를 리턴하는 함수 호출
         LocalTime now = getCurrentHourAndMinuteToLocalTime();
 
