@@ -22,6 +22,11 @@ public class CollectionRequestDto {
     private List<Long> articles;
 
     public Collection toEntity() {
-        return new Collection(title, description, isPublic);
+        return Collection.builder()
+                .title(title)
+                .description(description)
+                .isPublic(isPublic)
+                .build();
+//        return new Collection(title, description, isPublic);
     }
 }

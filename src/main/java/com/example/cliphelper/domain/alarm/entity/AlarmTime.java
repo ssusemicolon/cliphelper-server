@@ -2,6 +2,7 @@ package com.example.cliphelper.domain.alarm.entity;
 
 import com.example.cliphelper.domain.collection.entity.Collection;
 import com.example.cliphelper.domain.user.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,8 +32,9 @@ public class AlarmTime {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public AlarmTime(LocalTime time, User user) {
-        this.id = null;
+    @Builder
+    public AlarmTime(Long id, LocalTime time, User user) {
+        this.id = id;
         this.time = time;
         this.user =user;
     }

@@ -95,7 +95,6 @@ public class Scheduler {
                         notificationTokenResponseDto.getUser().getUsername()))
                 .collect(Collectors.toList());
 
-
         // 선택한 알고리즘을 바탕으로, 유저의 디바이스 토큰과 함께 묶어 Message 객체 생성 후 send
         pushNotificationRequestDtos.forEach(pushNotificationRequestDto ->
                 fcmService.sendArticleRecommendationNotification(pushNotificationRequestDto));

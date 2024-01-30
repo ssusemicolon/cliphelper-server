@@ -20,10 +20,10 @@ public class AlarmTimeService {
 
     @Transactional
     public void addAlarmTime(User user, LocalTime alarmTime) {
-        if (alarmTimeRepository.existsByUserIdAndTimeIs(user.getId(), alarmTime)) {
+        if (alarmTimeRepository.existsByUserIdAndTime(user.getId(), alarmTime)) {
             throw new BusinessException(ErrorCode.ALARM_TIME_ALREADY_EXISTS);
         }
-        alarmTimeRepository.save(new AlarmTime(alarmTime, user));
+        alarmTimeRepository.save(new AlarmTime(null, alarmTime, user));
     }
 
     public AlarmTime getAlarmTime(Long alarmTimeId) {

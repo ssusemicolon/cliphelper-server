@@ -5,7 +5,10 @@ import com.example.cliphelper.domain.tag.entity.ArticleTag;
 import com.example.cliphelper.domain.tag.entity.Tag;
 import com.example.cliphelper.domain.tag.repository.ArticleTagRepository;
 import com.example.cliphelper.domain.tag.repository.TagRepository;
+import com.example.cliphelper.global.config.FCMConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

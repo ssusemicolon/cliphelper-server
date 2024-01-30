@@ -54,22 +54,19 @@ public class UserService {
     }
 
     public UserProfileResponseDto findUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(userId);
 
         return UserProfileResponseDto.of(user);
     }
 
     public UserDetailedProfileResponseDto getUserProfile() {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
 
         return UserDetailedProfileResponseDto.of(user);
     }
 
     public List<AlarmTimeResponseDto> getUserAlarmTimeList() {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
 
         return user.getAlarmTimeList()
                 .stream()
@@ -79,9 +76,7 @@ public class UserService {
 
     @Transactional
     public void modifyProfile(UserModifyProfileRequestDto userModifyProfileRequestDto) {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
-
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
         user.changeUsername(userModifyProfileRequestDto.getUsername());
 
         final MultipartFile modifiedPicture = userModifyProfileRequestDto.getPicture();
@@ -96,8 +91,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser() {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
 
         List<Article> articles = user.getArticles();
         articles.forEach(article -> {
@@ -111,16 +105,14 @@ public class UserService {
 
     @Transactional
     public void changeNotificationsPreference(boolean status) {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
 
         user.changeEnableNotifications(status);
     }
 
     @Transactional
     public void addAlarmTime(String alarmTimeStr) {
-        User user = userRepository.findById(securityUtils.getCurrentUserId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = validateAndFindUser(securityUtils.getCurrentUserId());
 
         int hour = convertToHour(alarmTimeStr);
         int minute = convertToMinute(alarmTimeStr);
@@ -154,5 +146,10 @@ public class UserService {
     // 특정 시간대를 알람 희망 시간대로 설정한 유저 조회
     public List<User> findUsersByAlarmTime(LocalTime time) {
         return userRepository.findByAlarmTime(time);
+    }
+
+    public User validateAndFindUser(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }
