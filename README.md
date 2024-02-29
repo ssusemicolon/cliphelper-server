@@ -53,5 +53,9 @@
 
 
 ## ERD
+[erdcloud 링크](https://www.erdcloud.com/d/9eS7mDZv8jc4S2G9C)
+
+<img width="1488" alt="image" src="https://github.com/ssusemicolon/cliphelper-server/assets/67828333/55063713-b62c-4ccc-a8b3-6de0bc95ad22">
+
 
 
